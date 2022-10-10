@@ -89,7 +89,7 @@ module.exports = {
       },
       dark: {
         200: "#fafafa",
-        500: "#d9d9d9",
+        500: "#595959",
       },
       dragon: {
         200: "#d6e4ff",

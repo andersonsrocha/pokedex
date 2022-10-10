@@ -6,19 +6,19 @@ import { LayoutContext } from "./layout";
 import { Pokemon } from "@types";
 
 export function App() {
+  const { search } = useContext(LayoutContext);
+
   const [loading, setLoading] = useState(false);
   const [pokemons, setPokemons] = useState<Array<Pokemon>>([]);
   const [pagination, setPagination] = useState<PaginationProps>({ count: 0, pageNumber: 1 });
-
-  const name = useContext(LayoutContext);
 
   const onPageChanged = ({ pageNumber, pageSize }: PageChangeEvent) => {
     setPagination((pag) => ({ ...pag, pageNumber, pageSize }));
   };
 
   const find = (list: Array<Pokemon>, pageNumber: number, pageSize: number) => {
-    const search = name.toLowerCase();
-    const pokemons = list.filter((x) => x.name.toLowerCase().includes(search));
+    const value = search.toLowerCase();
+    const pokemons = list.filter((x) => x.name.toLowerCase().includes(value));
     const sliced = pokemons.slice(
       (pageNumber - 1) * pageSize,
       (pageNumber - 1) * pageSize + pageSize
@@ -32,7 +32,7 @@ export function App() {
 
   useEffect(() => {
     setPagination((pag) => ({ ...pag, pageNumber: 1 }));
-  }, [name]);
+  }, [search]);
 
   useEffect(() => {
     (async () => {
@@ -40,14 +40,14 @@ export function App() {
 
       const { pageNumber, pageSize = 20 } = pagination;
 
-      const url = name
+      const url = search
         ? `https://pokeapi.co/api/v2/pokemon-species?limit=10000`
         : `https://pokeapi.co/api/v2/pokemon-species?limit=${pageSize}&offset=${
             (pageNumber - 1) * pageSize
           }`;
       const request = await fetch(url);
       const response = await request.json();
-      const filtered = name ? find(response.results, pageNumber, pageSize) : response;
+      const filtered = search ? find(response.results, pageNumber, pageSize) : response;
 
       const list: Array<Pokemon> = [];
       for (const item of filtered.results) {
@@ -61,7 +61,7 @@ export function App() {
 
       setLoading(false);
     })();
-  }, [pagination.pageNumber, name]);
+  }, [pagination.pageNumber, search]);
 
   return (
     <Spin spinning={loading}>

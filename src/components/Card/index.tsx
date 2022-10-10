@@ -1,8 +1,10 @@
-import React from "react";
-import classNames from "classnames";
+import React, { useContext } from "react";
 import { getType, getTypeIcon } from "@utils";
 import { Stats } from "@components";
+import classNames from "classnames";
 import * as Icons from "@icons";
+
+import { LayoutContext } from "../../layout";
 
 import { Pokemon } from "@types";
 
@@ -12,6 +14,8 @@ type Props = {
 
 export function Card(props: Props) {
   const { pokemon } = props;
+
+  const { v } = useContext(LayoutContext);
 
   const pokeNumber = String(pokemon.id).padStart(3, "0");
   const typeLen = pokemon.types.length;
@@ -82,7 +86,7 @@ export function Card(props: Props) {
             <div className="poke-number font-extrabold">{`#${pokeNumber}`}</div>
             <div className="poke-icon h-[100px]">
               <img
-                src={pokemon.sprites.other["official-artwork"].front_default}
+                src={pokemon.sprites.other[v == 1 ? "official-artwork" : "home"].front_default}
                 alt="poke"
                 width={100}
               />

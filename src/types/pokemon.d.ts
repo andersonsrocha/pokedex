@@ -37,5 +37,5 @@ export interface Stats {
 }
 
 export interface Sprite {
-  other: Record<"official-artwork", Record<"front_default", string>>;
+  other: Record<"official-artwork" | "home", Record<"front_default", string>>;
 }
