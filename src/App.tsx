@@ -1,43 +1,79 @@
-import { useEffect, useState } from "react";
-import { Card } from "@components";
+import { useContext, useEffect, useState } from "react";
+import { Card, PageChangeEvent, Pagination, PaginationProps, Spin } from "@components";
 
-import { Header } from "./layout";
+import { LayoutContext } from "./layout";
 
 import { Pokemon } from "@types";
 
 export function App() {
   const [loading, setLoading] = useState(false);
   const [pokemons, setPokemons] = useState<Array<Pokemon>>([]);
+  const [pagination, setPagination] = useState<PaginationProps>({ count: 0, pageNumber: 1 });
+
+  const name = useContext(LayoutContext);
+
+  const onPageChanged = ({ pageNumber, pageSize }: PageChangeEvent) => {
+    setPagination((pag) => ({ ...pag, pageNumber, pageSize }));
+  };
+
+  const find = (list: Array<Pokemon>, pageNumber: number, pageSize: number) => {
+    const search = name.toLowerCase();
+    const pokemons = list.filter((x) => x.name.toLowerCase().includes(search));
+    const sliced = pokemons.slice(
+      (pageNumber - 1) * pageSize,
+      (pageNumber - 1) * pageSize + pageSize
+    );
+
+    return {
+      count: pokemons.length,
+      results: sliced,
+    };
+  };
+
+  useEffect(() => {
+    setPagination((pag) => ({ ...pag, pageNumber: 1 }));
+  }, [name]);
 
   useEffect(() => {
     (async () => {
       setLoading(true);
-      const request = await fetch("https://pokeapi.co/api/v2/pokemon");
-      const response = await request.json();
 
-      const list = [];
-      for (const item of response.results) {
-        const request = await fetch(item.url);
-        const response = await request.json();
+      const { pageNumber, pageSize = 20 } = pagination;
+
+      const url = name
+        ? `https://pokeapi.co/api/v2/pokemon-species?limit=10000`
+        : `https://pokeapi.co/api/v2/pokemon-species?limit=${pageSize}&offset=${
+            (pageNumber - 1) * pageSize
+          }`;
+      const request = await fetch(url);
+      const response = await request.json();
+      const filtered = name ? find(response.results, pageNumber, pageSize) : response;
+
+      const list: Array<Pokemon> = [];
+      for (const item of filtered.results) {
+        const request = await fetch(item.url.replace("-species", ""));
+        const response = (await request.json()) as Pokemon;
         list.push(response);
       }
 
       setPokemons(list);
+      setPagination((pag) => ({ ...pag, count: filtered.count }));
+
       setLoading(false);
     })();
-  }, []);
+  }, [pagination.pageNumber, name]);
 
   return (
-    <section>
-      <Header />
+    <Spin spinning={loading}>
+      <div className="grid md:grid-cols-4 sm:grid-cols-2 gap-6">
+        {pokemons.map((pokemon) => (
+          <Card key={pokemon.name} pokemon={pokemon} />
+        ))}
+      </div>
 
-      <main className="bg-brand-100 min-h-screen h-auto px-20 py-10 font-brand">
-        <div className="grid md:grid-cols-4 sm:grid-cols-2 gap-6">
-          {pokemons.map((pokemon) => (
-            <Card key={pokemon.name} pokemon={pokemon} />
-          ))}
-        </div>
-      </main>
-    </section>
+      <div className="mt-8 flex justify-center">
+        <Pagination {...pagination} onChange={onPageChanged} />
+      </div>
+    </Spin>
   );
 }

@@ -18,27 +18,47 @@ export function Card(props: Props) {
 
   const getGradientClassName = (position: number) => {
     return classNames({
-      "to-brand-100 from-grass-500": getType(pokemon, position) === "grass",
-      "to-brand-100 from-fire-500": getType(pokemon, position) === "fire",
-      "to-brand-100 from-water-500": getType(pokemon, position) === "water",
-      "to-brand-100 from-poison-500": getType(pokemon, position) === "poison",
       "to-brand-100 from-bug-500": getType(pokemon, position) === "bug",
-      "to-brand-100 from-flying-500": getType(pokemon, position) === "flying",
-      "to-brand-100 from-normal-500": getType(pokemon, position) === "normal",
+      "to-brand-100 from-dark-500": getType(pokemon, position) === "dark",
+      "to-brand-100 from-dragon-500": getType(pokemon, position) === "dragon",
       "to-brand-100 from-electric-500": getType(pokemon, position) === "electric",
+      "to-brand-100 from-fairy-500": getType(pokemon, position) === "fairy",
+      "to-brand-100 from-fighting-500": getType(pokemon, position) === "fighting",
+      "to-brand-100 from-fire-500": getType(pokemon, position) === "fire",
+      "to-brand-100 from-flying-500": getType(pokemon, position) === "flying",
+      "to-brand-100 from-ghost-500": getType(pokemon, position) === "ghost",
+      "to-brand-100 from-grass-500": getType(pokemon, position) === "grass",
+      "to-brand-100 from-ground-500": getType(pokemon, position) === "ground",
+      "to-brand-100 from-ice-500": getType(pokemon, position) === "ice",
+      "to-brand-100 from-normal-500": getType(pokemon, position) === "normal",
+      "to-brand-100 from-poison-500": getType(pokemon, position) === "poison",
+      "to-brand-100 from-psychic-500": getType(pokemon, position) === "psychic",
+      "to-brand-100 from-rock-500": getType(pokemon, position) === "rock",
+      "to-brand-100 from-steel-500": getType(pokemon, position) === "steel",
+      "to-brand-100 from-water-500": getType(pokemon, position) === "water",
     });
   };
 
   const getColorClassName = (position: number) => {
     return classNames({
-      "text-grass-500": getType(pokemon, position) === "grass",
-      "text-fire-500": getType(pokemon, position) === "fire",
-      "text-water-500": getType(pokemon, position) === "water",
-      "text-poison-500": getType(pokemon, position) === "poison",
       "text-bug-500": getType(pokemon, position) === "bug",
-      "text-flying-500": getType(pokemon, position) === "flying",
-      "text-normal-500": getType(pokemon, position) === "normal",
+      "text-dark-500": getType(pokemon, position) === "dark",
+      "text-dragon-500": getType(pokemon, position) === "dragon",
       "text-electric-500": getType(pokemon, position) === "electric",
+      "text-fairy-500": getType(pokemon, position) === "fairy",
+      "text-fighting-500": getType(pokemon, position) === "fighting",
+      "text-fire-500": getType(pokemon, position) === "fire",
+      "text-flying-500": getType(pokemon, position) === "flying",
+      "text-ghost-500": getType(pokemon, position) === "ghost",
+      "text-grass-500": getType(pokemon, position) === "grass",
+      "text-ground-500": getType(pokemon, position) === "ground",
+      "text-ice-500": getType(pokemon, position) === "ice",
+      "text-normal-500": getType(pokemon, position) === "normal",
+      "text-poison-500": getType(pokemon, position) === "poison",
+      "text-psychic-500": getType(pokemon, position) === "psychic",
+      "text-rock-500": getType(pokemon, position) === "rock",
+      "text-steel-500": getType(pokemon, position) === "steel",
+      "text-water-500": getType(pokemon, position) === "water",
     });
   };
 
@@ -52,7 +72,7 @@ export function Card(props: Props) {
 
   return (
     <div className="shadow-lg cursor-pointer hover:scale-105 transition duration-300 ease-in-out">
-      <div className="container h-96">
+      <div className="container h-[390px]">
         <div
           className={`bg-gradient-radial flex flex-col h-full rounded-lg ${getGradientClassName(
             0
@@ -60,7 +80,7 @@ export function Card(props: Props) {
         >
           <div className="text-white p-2 flex flex-col items-center">
             <div className="poke-number font-extrabold">{`#${pokeNumber}`}</div>
-            <div className="poke-icon h-full">
+            <div className="poke-icon h-[100px]">
               <img
                 src={pokemon.sprites.other["official-artwork"].front_default}
                 alt="poke"
