@@ -17,10 +17,11 @@ module.exports = {
       },
     },
     fontFamily: {
-      brand: ["Bahnschrift SemiBold"],
+      brand: ["Bahnschrift SemiBold", "'Roboto Condensed'", "sans-serif"],
     },
     colors: {
       white: "#ffffff",
+      black: "#000000",
       red: "#f5222d",
       yellow: "#fadb14",
       green: "#52c41a",

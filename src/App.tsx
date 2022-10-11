@@ -1,5 +1,5 @@
 import { useContext, useEffect, useState } from "react";
-import { Card, Modal, PageChangeEvent, Pagination, PaginationProps, Skeleton } from "@components";
+import { Card, Empty, PageChangeEvent, Pagination, PaginationProps, Skeleton } from "@components";
 
 import { LayoutContext } from "./layout";
 
@@ -73,6 +73,7 @@ export function App() {
           <Card key={pokemon.name} pokemon={pokemon} />
         ))}
       </div>
+      {!pokemons.length && <Empty />}
 
       <div className="mt-8 flex justify-center">
         <Pagination {...pagination} onChange={onPageChanged} />

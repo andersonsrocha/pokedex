@@ -124,20 +124,20 @@ export function Card(props: Props) {
                 <button
                   title="Form"
                   onClick={onVarietyChanged}
-                  className="flex justify-center items-center bg-brand-100 absolute translate-x-[120px] w-6 h-6 rounded-full text-sm hover:bg-brand-500"
+                  className="flex justify-center items-center bg-brand-100 absolute translate-x-[150px] md:translate-x-[120px] w-6 h-6 rounded-full text-sm hover:bg-brand-500"
                 >
                   ✨
                 </button>
               )}
               <div className="font-extrabold">{`#${pokeNumber}`}</div>
-              <div className="poke-icon h-[100px]">
+              <div className="h-[100px]">
                 <img
-                  src={pokemon.sprites.other[v == 1 ? "official-artwork" : "home"].front_default}
                   alt="poke"
                   width={100}
+                  src={pokemon.sprites.other[v == 1 ? "official-artwork" : "home"].front_default}
                 />
               </div>
-              <div className="poke-name capitalize">{pokemon.name}</div>
+              <div className="capitalize">{pokemon.name}</div>
             </div>
 
             <div className="bg-white text-sm shadow-2xl flex flex-col gap-4 flex-1 rounded-t-2xl rounded-b-lg p-4">

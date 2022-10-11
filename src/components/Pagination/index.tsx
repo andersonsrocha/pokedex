@@ -22,7 +22,7 @@ export function Pagination(props: PaginationProps) {
   const LEFT_PAGE_CONST = "LEFT";
   const RIGHT_PAGE_CONST = "RIGHT";
 
-  const pagesCount = Math.ceil(count / pageSize);
+  const pagesCount = Math.max(1, Math.ceil(count / pageSize));
   const pagesNeighbours = 2;
   const pagesNumbers = pagesNeighbours * 2 + 3;
   const pagesBlocks = pagesNumbers + 2;

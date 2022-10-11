@@ -2,7 +2,7 @@ import { GithubOutline, LinkedinOutline } from "@icons";
 
 export function Footer() {
   return (
-    <div className="h-16 bg-brand-100 px-20">
+    <div className="h-16 bg-brand-100 px-4 md:px-20">
       <div className="h-full flex items-center justify-between border-t-[1px] border-divide">
         <div />
 

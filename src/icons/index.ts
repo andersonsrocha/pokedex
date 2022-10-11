@@ -2,6 +2,7 @@ export * from "./BugOutline";
 export * from "./DarkOutline";
 export * from "./DragonOutline";
 export * from "./ElectricOutline";
+export * from "./EmptyOutline";
 export * from "./FairyOutline";
 export * from "./FightingOutline";
 export * from "./FireOutline";
