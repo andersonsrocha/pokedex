@@ -1,8 +1,8 @@
-import React, { useContext } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { getType, getTypeIcon } from "@utils";
-import { Stats } from "@components";
+import { Spin, Stats } from "@components";
+import { WeightOutline, HeightOutline } from "@icons";
 import classNames from "classnames";
-import * as Icons from "@icons";
 
 import { LayoutContext } from "../../layout";
 
@@ -10,10 +10,15 @@ import { Pokemon } from "@types";
 
 type Props = {
   pokemon: Pokemon;
+  onClick?: () => void;
 };
 
 export function Card(props: Props) {
-  const { pokemon } = props;
+  const { onClick } = props;
+
+  const [loading, setLoading] = useState(false);
+  const [pokemon, setPokemon] = useState(props.pokemon);
+  const [variety, setVariety] = useState(-1);
 
   const { v } = useContext(LayoutContext);
 
@@ -74,102 +79,144 @@ export function Card(props: Props) {
     return `${height / 10} m`;
   };
 
-  return (
-    <div className="shadow-lg cursor-pointer hover:scale-105 transition duration-300 ease-in-out">
-      <div className="container h-[390px]">
-        <div
-          className={`bg-gradient-radial flex flex-col h-full rounded-lg ${getGradientClassName(
-            0
-          )}`}
-        >
-          <div className="text-white p-2 flex flex-col items-center">
-            <div className="poke-number font-extrabold">{`#${pokeNumber}`}</div>
-            <div className="poke-icon h-[100px]">
-              <img
-                src={pokemon.sprites.other[v == 1 ? "official-artwork" : "home"].front_default}
-                alt="poke"
-                width={100}
-              />
-            </div>
-            <div className="poke-name capitalize">{pokemon.name}</div>
-          </div>
+  const onVarietyChanged = () => {
+    setVariety((old) => {
+      const { varieties } = pokemon;
+      if (old + 1 == varieties.length) {
+        return 0;
+      } else if (old < 0) {
+        return 1;
+      } else {
+        return old + 1;
+      }
+    });
+  };
 
-          <div className="bg-white text-sm shadow-2xl flex flex-col gap-4 flex-1 rounded-t-2xl rounded-b-lg p-4">
-            {/* types */}
-            <div className={`grid grid-cols-${typeLen}`}>
-              {pokemon.types.map(({ type }, index) => (
-                <div key={index} className="flex justify-center">
-                  <div
-                    className={`rounded-md py-1/2 px-2 capitalize border-2 drop-shadow-[0_0_4px] flex justify-center items-center gap-1 ${getColorClassName(
-                      index
-                    )}`}
-                  >
-                    {React.createElement(getTypeIcon(type.name), { className: "w-3" })}
-                    {type.name}
+  useEffect(() => {
+    (async () => {
+      if (variety > -1) {
+        setLoading(true);
+
+        const { varieties } = pokemon;
+        const request = await fetch(varieties[variety].pokemon.url);
+        const response = await request.json();
+
+        setPokemon(({ varieties }) => ({ ...response, varieties }));
+        setLoading(false);
+      }
+    })();
+  }, [variety]);
+
+  return (
+    <div
+      onClick={onClick}
+      className="shadow-lg cursor-pointer hover:scale-105 transition duration-300 ease-in-out"
+    >
+      <div className="container h-[390px]">
+        <Spin spinning={loading}>
+          <div
+            className={`bg-gradient-radial flex flex-col h-full rounded-lg ${getGradientClassName(
+              0
+            )}`}
+          >
+            <div className="text-white p-2 flex flex-col items-center">
+              {pokemon.varieties.length > 1 && (
+                <button
+                  title="Form"
+                  onClick={onVarietyChanged}
+                  className="flex justify-center items-center bg-brand-100 absolute translate-x-[120px] w-6 h-6 rounded-full text-sm hover:bg-brand-500"
+                >
+                  ✨
+                </button>
+              )}
+              <div className="font-extrabold">{`#${pokeNumber}`}</div>
+              <div className="poke-icon h-[100px]">
+                <img
+                  src={pokemon.sprites.other[v == 1 ? "official-artwork" : "home"].front_default}
+                  alt="poke"
+                  width={100}
+                />
+              </div>
+              <div className="poke-name capitalize">{pokemon.name}</div>
+            </div>
+
+            <div className="bg-white text-sm shadow-2xl flex flex-col gap-4 flex-1 rounded-t-2xl rounded-b-lg p-4">
+              {/* types */}
+              <div className={`grid grid-cols-${typeLen}`}>
+                {pokemon.types.map(({ type }, index) => (
+                  <div key={index} className="flex justify-center">
+                    <div
+                      className={`rounded-md py-1/2 px-2 capitalize border-2 drop-shadow-[0_0_4px] flex justify-center items-center gap-1 ${getColorClassName(
+                        index
+                      )}`}
+                    >
+                      {React.createElement(getTypeIcon(type.name), { className: "w-3" })}
+                      {type.name}
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              {/* info */}
+              <div className="grid grid-cols-2 divide-x">
+                <div className="flex justify-center items-center gap-1">
+                  <WeightOutline />
+                  {getWeight(pokemon.weight)}
+                </div>
+                <div className="flex justify-center items-center gap-1">
+                  <HeightOutline />
+                  {getHeight(pokemon.height)}
+                </div>
+              </div>
+
+              {/* stats */}
+              <div>
+                <div className="grid grid-cols-12 items-center">
+                  <div className="col-span-3">HP</div>
+                  <div className="col-span-2">{pokemon.stats[0].base_stat}</div>
+                  <div className="col-span-7">
+                    <Stats value={pokemon.stats[0].base_stat} />
                   </div>
                 </div>
-              ))}
-            </div>
-
-            {/* info */}
-            <div className="grid grid-cols-2 divide-x">
-              <div className="flex justify-center items-center gap-1">
-                <Icons.WeightOutline />
-                {getWeight(pokemon.weight)}
-              </div>
-              <div className="flex justify-center items-center gap-1">
-                <Icons.HeightOutline />
-                {getHeight(pokemon.height)}
-              </div>
-            </div>
-
-            {/* stats */}
-            <div>
-              <div className="grid grid-cols-12 items-center">
-                <div className="col-span-3">HP</div>
-                <div className="col-span-2">{pokemon.stats[0].base_stat}</div>
-                <div className="col-span-7">
-                  <Stats value={pokemon.stats[0].base_stat} />
+                <div className="grid grid-cols-12 items-center">
+                  <div className="col-span-3">Attack</div>
+                  <div className="col-span-2">{pokemon.stats[1].base_stat}</div>
+                  <div className="col-span-7">
+                    <Stats value={pokemon.stats[1].base_stat} />
+                  </div>
                 </div>
-              </div>
-              <div className="grid grid-cols-12 items-center">
-                <div className="col-span-3">Attack</div>
-                <div className="col-span-2">{pokemon.stats[1].base_stat}</div>
-                <div className="col-span-7">
-                  <Stats value={pokemon.stats[1].base_stat} />
+                <div className="grid grid-cols-12 items-center">
+                  <div className="col-span-3">Defense</div>
+                  <div className="col-span-2">{pokemon.stats[2].base_stat}</div>
+                  <div className="col-span-7">
+                    <Stats value={pokemon.stats[2].base_stat} />
+                  </div>
                 </div>
-              </div>
-              <div className="grid grid-cols-12 items-center">
-                <div className="col-span-3">Defense</div>
-                <div className="col-span-2">{pokemon.stats[2].base_stat}</div>
-                <div className="col-span-7">
-                  <Stats value={pokemon.stats[2].base_stat} />
+                <div className="grid grid-cols-12 items-center">
+                  <div className="col-span-3">Sp. Atk</div>
+                  <div className="col-span-2">{pokemon.stats[3].base_stat}</div>
+                  <div className="col-span-7">
+                    <Stats value={pokemon.stats[3].base_stat} />
+                  </div>
                 </div>
-              </div>
-              <div className="grid grid-cols-12 items-center">
-                <div className="col-span-3">Sp. Atk</div>
-                <div className="col-span-2">{pokemon.stats[3].base_stat}</div>
-                <div className="col-span-7">
-                  <Stats value={pokemon.stats[3].base_stat} />
+                <div className="grid grid-cols-12 items-center">
+                  <div className="col-span-3">Sp. Def</div>
+                  <div className="col-span-2">{pokemon.stats[4].base_stat}</div>
+                  <div className="col-span-7">
+                    <Stats value={pokemon.stats[4].base_stat} />
+                  </div>
                 </div>
-              </div>
-              <div className="grid grid-cols-12 items-center">
-                <div className="col-span-3">Sp. Def</div>
-                <div className="col-span-2">{pokemon.stats[4].base_stat}</div>
-                <div className="col-span-7">
-                  <Stats value={pokemon.stats[4].base_stat} />
-                </div>
-              </div>
-              <div className="grid grid-cols-12 items-center">
-                <div className="col-span-3">Speed</div>
-                <div className="col-span-2">{pokemon.stats[5].base_stat}</div>
-                <div className="col-span-7">
-                  <Stats value={pokemon.stats[5].base_stat} />
+                <div className="grid grid-cols-12 items-center">
+                  <div className="col-span-3">Speed</div>
+                  <div className="col-span-2">{pokemon.stats[5].base_stat}</div>
+                  <div className="col-span-7">
+                    <Stats value={pokemon.stats[5].base_stat} />
+                  </div>
                 </div>
               </div>
             </div>
           </div>
-        </div>
+        </Spin>
       </div>
     </div>
   );

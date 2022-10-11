@@ -1,5 +1,5 @@
 import { useContext, useEffect, useState } from "react";
-import { Card, PageChangeEvent, Pagination, PaginationProps, Spin } from "@components";
+import { Card, Modal, PageChangeEvent, Pagination, PaginationProps, Skeleton } from "@components";
 
 import { LayoutContext } from "./layout";
 
@@ -51,9 +51,12 @@ export function App() {
 
       const list: Array<Pokemon> = [];
       for (const item of filtered.results) {
-        const request = await fetch(item.url.replace("-species", ""));
-        const response = (await request.json()) as Pokemon;
-        list.push(response);
+        const request1 = await fetch(item.url);
+        const request2 = await fetch(item.url.replace("-species", ""));
+
+        const specie = await request1.json();
+        const pokemon = (await request2.json()) as Pokemon;
+        list.push({ ...pokemon, varieties: specie.varieties });
       }
 
       setPokemons(list);
@@ -64,7 +67,7 @@ export function App() {
   }, [pagination.pageNumber, search]);
 
   return (
-    <Spin spinning={loading}>
+    <Skeleton spinning={loading}>
       <div className="grid md:grid-cols-4 sm:grid-cols-2 gap-6">
         {pokemons.map((pokemon) => (
           <Card key={pokemon.name} pokemon={pokemon} />
@@ -74,6 +77,6 @@ export function App() {
       <div className="mt-8 flex justify-center">
         <Pagination {...pagination} onChange={onPageChanged} />
       </div>
-    </Spin>
+    </Skeleton>
   );
 }

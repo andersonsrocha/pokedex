@@ -26,6 +26,13 @@ export interface Pokemon {
   height: number;
   stats: Array<Stats>;
   sprites: Sprite;
+  varieties: Array<Variety>;
+  url: string;
+}
+
+export interface Variety {
+  is_default: boolean;
+  pokemon: Pick<Pokemon, "name" | "url">;
 }
 
 export interface Type {

@@ -7,25 +7,12 @@ module.exports = {
         "gradient-radial": "radial-gradient(var(--tw-gradient-stops))",
       },
       animation: {
-        shake: "shake 0.5s linear infinite",
+        zoomIn: "zoomIn .5s both",
       },
       keyframes: {
-        wiggle: {
-          "0%, 100%": { transform: "rotate(-3deg)" },
-          "50%": { transform: "rotate(3deg)" },
-        },
-        shake: {
-          "0%": { transform: "translate(-1px, -2px) rotate(-1deg)" },
-          "20%": { transform: "translate(-3px, 0px) rotate(1deg)" },
-          "30%": { transform: "translate(3px, 2px) rotate(0deg)" },
-          "40%": { transform: "translate(1px, -1px) rotate(1deg)" },
-          "50%": { transform: "translate(-1px, 2px) rotate(-1deg)" },
-          "60%": { transform: "translate(-3px, 1px) rotate(0deg)" },
-          "70%": { transform: "translate(3px, 1px) rotate(-1deg)" },
-          "80%": { transform: "translate(-1px, -1px) rotate(1deg)" },
-          "90%": { transform: "translate(1px, 2px) rotate(0deg)" },
-          "1%": { transform: "translate(1px, 1px) rotate(0deg)" },
-          "100%": { transform: "translate(1px, -2px) rotate(-1deg)" },
+        zoomIn: {
+          "0%": { opacity: 0, transform: "scale3d(.3,.3,.3)" },
+          "50%": { opacity: 1 },
         },
       },
     },
