@@ -110,7 +110,7 @@ export function Card(props: Props) {
   return (
     <div
       onClick={onClick}
-      className="shadow-lg cursor-pointer hover:scale-105 transition duration-300 ease-in-out"
+      className="shadow-lg cursor-pointer md:hover:scale-105 transition duration-300 ease-in-out"
     >
       <div className="container h-[390px]">
         <Spin spinning={loading}>
@@ -124,7 +124,7 @@ export function Card(props: Props) {
                 <button
                   title="Form"
                   onClick={onVarietyChanged}
-                  className="flex justify-center items-center bg-brand-100 absolute translate-x-[150px] md:translate-x-[120px] w-6 h-6 rounded-full text-sm hover:bg-brand-500"
+                  className="flex justify-center items-center bg-brand-100 absolute translate-x-[600%] md:translate-x-[500%] w-6 h-6 rounded-full text-sm hover:bg-brand-500"
                 >
                   ✨
                 </button>
