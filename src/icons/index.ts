@@ -1,4 +1,6 @@
+export * from "./ArrowRightOutline";
 export * from "./BugOutline";
+export * from "./CloseOutline";
 export * from "./DarkOutline";
 export * from "./DragonOutline";
 export * from "./ElectricOutline";

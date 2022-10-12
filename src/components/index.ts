@@ -5,3 +5,4 @@ export * from "./Skeleton";
 export * from "./Spin";
 export * from "./Modal";
 export * from "./Empty";
+export * from "./Evolution";

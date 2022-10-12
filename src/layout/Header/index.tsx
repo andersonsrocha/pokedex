@@ -49,9 +49,6 @@ export function Header({ onChange }: Props) {
                 <option className="border border-divide rounded-none" value={1}>
                   V1
                 </option>
-                <option className="border border-divide rounded-none" value={2}>
-                  V2
-                </option>
               </select>
             </div>
           </form>

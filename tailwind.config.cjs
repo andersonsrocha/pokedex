@@ -17,7 +17,7 @@ module.exports = {
       },
     },
     fontFamily: {
-      brand: ["Bahnschrift SemiBold", "'Roboto Condensed'", "sans-serif"],
+      brand: ["Bahnschrift", "'Roboto Condensed'", "sans-serif"],
     },
     colors: {
       white: "#ffffff",
@@ -105,5 +105,5 @@ module.exports = {
       },
     },
   },
-  plugins: [],
+  plugins: [require("tailwindcss-animate")],
 };

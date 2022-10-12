@@ -1,20 +1,27 @@
 import { useContext, useEffect, useState } from "react";
-import { Card, Empty, PageChangeEvent, Pagination, PaginationProps, Skeleton } from "@components";
+import {
+  Card,
+  Empty,
+  Modal,
+  PageChangeEvent,
+  Pagination,
+  PaginationProps,
+  Skeleton,
+  Spin,
+} from "@components";
 
 import { LayoutContext } from "./layout";
 
-import { Pokemon } from "@types";
+import { Description, Genera, Pokemon } from "@types";
 
 export function App() {
   const { search } = useContext(LayoutContext);
 
+  const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [pokemon, setPokemon] = useState<Pokemon>();
   const [pokemons, setPokemons] = useState<Array<Pokemon>>([]);
   const [pagination, setPagination] = useState<PaginationProps>({ count: 0, pageNumber: 1 });
-
-  const onPageChanged = ({ pageNumber, pageSize }: PageChangeEvent) => {
-    setPagination((pag) => ({ ...pag, pageNumber, pageSize }));
-  };
 
   const find = (list: Array<Pokemon>, pageNumber: number, pageSize: number) => {
     const value = search.toLowerCase();
@@ -28,6 +35,15 @@ export function App() {
       count: pokemons.length,
       results: sliced,
     };
+  };
+
+  const onCardClick = (pokemon: Pokemon) => {
+    setOpen(true);
+    setPokemon(pokemon);
+  };
+
+  const onPageChanged = ({ pageNumber, pageSize }: PageChangeEvent) => {
+    setPagination((pag) => ({ ...pag, pageNumber, pageSize }));
   };
 
   useEffect(() => {
@@ -51,26 +67,22 @@ export function App() {
 
       const list: Array<Pokemon> = [];
       for (const item of filtered.results) {
-        const request1 = await fetch(item.url);
-        const request2 = await fetch(item.url.replace("-species", ""));
-
-        const specie = await request1.json();
-        const pokemon = (await request2.json()) as Pokemon;
-        list.push({ ...pokemon, varieties: specie.varieties });
+        const request = await fetch(item.url.replace("-species", ""));
+        const pokemon = (await request.json()) as Pokemon;
+        list.push(pokemon);
       }
 
       setPokemons(list);
       setPagination((pag) => ({ ...pag, count: filtered.count }));
-
       setLoading(false);
     })();
   }, [pagination.pageNumber, search]);
 
   return (
-    <Skeleton spinning={loading}>
+    <Spin spinning={loading}>
       <div className="grid md:grid-cols-4 sm:grid-cols-2 gap-6">
         {pokemons.map((pokemon) => (
-          <Card key={pokemon.name} pokemon={pokemon} />
+          <Card key={pokemon.name} pokemon={pokemon} onClick={() => onCardClick(pokemon)} />
         ))}
       </div>
       {!pokemons.length && <Empty />}
@@ -78,6 +90,13 @@ export function App() {
       <div className="mt-8 flex justify-center">
         <Pagination {...pagination} onChange={onPageChanged} />
       </div>
-    </Skeleton>
+
+      <Modal
+        open={open}
+        pokemon={pokemon}
+        onClose={() => setOpen(false)}
+        onClick={(pokemon) => setPokemon(pokemon)}
+      />
+    </Spin>
   );
 }

@@ -19,20 +19,31 @@ export type Typing =
   | "water";
 
 export interface Pokemon {
+  abilities: Array<Record<"ability", Ability>>;
+  base_experience: number;
+  height: number;
   id: number;
   name: string;
+  sprites: Sprite;
+  stats: Array<Stats>;
   types: Array<Type>;
   weight: number;
-  height: number;
-  stats: Array<Stats>;
-  sprites: Sprite;
+}
+
+export interface Specie {
+  base_happiness: number;
+  capture_rate: number;
   varieties: Array<Variety>;
-  url: string;
+  evolution_chain: Chain;
+  flavor_text_entries: Array<Description>;
+  names: Array<Language>;
+  genera: Array<Genera>;
+  growth_rate: Record<"name" | "url", string>;
 }
 
 export interface Variety {
   is_default: boolean;
-  pokemon: Pick<Pokemon, "name" | "url">;
+  pokemon: Record<"name" | "url", string>;
 }
 
 export interface Type {
@@ -45,4 +56,30 @@ export interface Stats {
 
 export interface Sprite {
   other: Record<"official-artwork" | "home", Record<"front_default", string>>;
+}
+
+export interface Language {
+  name: string;
+  language: Record<"name" | "url", string>;
+}
+
+export interface Description {
+  flavor_text: string;
+  language: Record<"name" | "url", string>;
+}
+
+export interface Ability {
+  name: string;
+  url: string;
+}
+
+export interface Genera {
+  genus: string;
+  language: Record<"name" | "url", string>;
+}
+
+export interface Chain {
+  id: number;
+  evolves_to: Array<Chain>;
+  species: Record<"name" | "url", string>;
 }
