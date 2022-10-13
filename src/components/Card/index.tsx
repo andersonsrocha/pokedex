@@ -124,8 +124,8 @@ export function Card(props: Props) {
                 <div className="text-white p-2 flex flex-col items-center">
                   {specie.varieties.length > 1 && (
                     <button
-                      title="Form"
-                      className="flex justify-center items-center bg-brand-100 absolute translate-x-[600%] md:translate-x-[500%] w-6 h-6 rounded-full text-sm hover:bg-brand-500"
+                      title="Transform"
+                      className="flex justify-center items-center bg-brand-100 absolute translate-x-[530%] md:translate-x-[500%] w-6 h-6 rounded-full text-sm hover:bg-brand-500"
                       onClick={(e) => onVarietyChanged(e, variety)}
                     >
                       ✨

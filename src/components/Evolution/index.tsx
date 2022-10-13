@@ -1,8 +1,10 @@
-import { ArrowRightOutline } from "@icons";
-import { Chain, Pokemon } from "@types";
-import classNames from "classnames";
 import { Fragment, useEffect, useState } from "react";
+import { ArrowRightOutline, ArrowDownOutline } from "@icons";
+import classNames from "classnames";
+
 import { Spin } from "../Spin";
+
+import { Chain, Pokemon } from "@types";
 
 type Props = {
   chain: Chain;
@@ -48,7 +50,7 @@ export function Evolution({ chain, onClick }: Props) {
 
   return (
     <Spin spinning={loading}>
-      <div className="flex justify-center gap-3 items-center">
+      <div className="flex flex-col md:flex-row justify-center gap-3 items-center">
         {evolution.map((pokes, index) => (
           <Fragment key={index}>
             <div className="min-w-[100px] grid grid-cols-12 gap-2">
@@ -79,8 +81,13 @@ export function Evolution({ chain, onClick }: Props) {
             </div>
 
             {index != evolution.length - 1 && (
-              <div className="text-[300%]">
-                <ArrowRightOutline />
+              <div>
+                <div className="text-[300%] hidden md:block">
+                  <ArrowRightOutline />
+                </div>
+                <div className="text-[300%] block md:hidden">
+                  <ArrowDownOutline />
+                </div>
               </div>
             )}
           </Fragment>

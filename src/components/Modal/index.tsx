@@ -133,7 +133,7 @@ export function Modal({ open, pokemon, onClose, onClick }: Props) {
             onClick={(e) => e.stopPropagation()}
             className="duration-500 animate-in fade-in zoom-in"
           >
-            <div className="w-[800px] h-[300px] bg-brand-500 rounded-lg text-white shadow-lg shadow-black">
+            <div className="w-[300px] h-[600px] md:w-[800px] md:h-[300px] bg-brand-500 rounded-lg text-white shadow-lg shadow-black">
               <Spin spinning={loading}>
                 <div className="flex justify-end w-full">
                   <button
@@ -144,8 +144,12 @@ export function Modal({ open, pokemon, onClose, onClick }: Props) {
                   </button>
                 </div>
 
-                <div className="grid grid-cols-[300px_auto] h-full">
-                  <div className={`rounded-l-lg bg-gradient-to-br ${getGradientClassName(0)}`}>
+                <div className="grid grid-cols-1 grid-rows-2 md:grid-rows-1 md:grid-cols-[300px_auto] h-full">
+                  <div
+                    className={`rounded-t-lg md:rounded-l-lg bg-gradient-to-br ${getGradientClassName(
+                      0
+                    )}`}
+                  >
                     <div className="flex items-center p-4">
                       <div className="font-bold text-4xl opacity-75">{getPokemonName(specie)}</div>
                       <img
@@ -197,23 +201,25 @@ export function Modal({ open, pokemon, onClose, onClick }: Props) {
                       </ul>
                     </div>
 
-                    <div className="flex flex-col gap-4 mt-4 text-sm font-thin">
+                    <div className="flex flex-col gap-4 mt-4 text-sm font-thin h-[200px] overflow-x-hidden overflow-y-auto md:overflow-visible">
                       {tab == "about" && <div>{getPokemonDescription(specie)}</div>}
 
                       {tab == "info" && (
-                        <div className="grid grid-cols-2 gap-1">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-1">
                           <div className="grid grid-cols-12 gap-1">
-                            <div className="font-bold col-span-4">Specie</div>
-                            <div className="col-span-8">{getPokemonGenera(specie)}</div>
+                            <div className="font-bold col-span-6 md:col-span-4">Specie</div>
+                            <div className="col-span-6 md:col-span-8">
+                              {getPokemonGenera(specie)}
+                            </div>
 
-                            <div className="font-bold col-span-4">Height</div>
-                            <div className="col-span-8">{pokemon.height / 10}m</div>
+                            <div className="font-bold col-span-6 md:col-span-4">Height</div>
+                            <div className="col-span-6 md:col-span-8">{pokemon.height / 10}m</div>
 
-                            <div className="font-bold col-span-4">Weight</div>
-                            <div className="col-span-8">{pokemon.weight / 10}kg</div>
+                            <div className="font-bold col-span-6 md:col-span-4">Weight</div>
+                            <div className="col-span-6 md:col-span-8">{pokemon.weight / 10}kg</div>
 
-                            <div className="font-bold col-span-4">Abilities</div>
-                            <div className="col-span-8 capitalize">
+                            <div className="font-bold col-span-6 md:col-span-4">Abilities</div>
+                            <div className="col-span-6 md:col-span-8 capitalize">
                               {pokemon.abilities.map((x) => x.ability.name).join(", ")}
                             </div>
                           </div>

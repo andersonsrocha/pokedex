@@ -1,3 +1,4 @@
+export * from "./ArrowDownOutline";
 export * from "./ArrowRightOutline";
 export * from "./BugOutline";
 export * from "./CloseOutline";
