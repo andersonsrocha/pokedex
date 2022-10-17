@@ -133,7 +133,7 @@ export function Modal({ open, pokemon, onClose, onClick }: Props) {
             onClick={(e) => e.stopPropagation()}
             className="duration-500 animate-in fade-in zoom-in"
           >
-            <div className="w-[300px] h-[600px] md:w-[800px] md:h-[300px] bg-brand-500 rounded-lg text-white shadow-lg shadow-black">
+            <div className="w-[90vw] md:w-[800px] md:h-[300px] bg-brand-500 rounded-lg text-white shadow-lg shadow-black">
               <Spin spinning={loading}>
                 <div className="flex justify-end w-full">
                   <button
@@ -146,7 +146,7 @@ export function Modal({ open, pokemon, onClose, onClick }: Props) {
 
                 <div className="grid grid-cols-1 grid-rows-2 md:grid-rows-1 md:grid-cols-[300px_auto] h-full">
                   <div
-                    className={`rounded-t-lg md:rounded-l-lg bg-gradient-to-br ${getGradientClassName(
+                    className={`rounded-t-lg md:rounded-l-lg md:rounded-r-none bg-gradient-to-br ${getGradientClassName(
                       0
                     )}`}
                   >
@@ -154,7 +154,7 @@ export function Modal({ open, pokemon, onClose, onClick }: Props) {
                       <div className="font-bold text-4xl opacity-75">{getPokemonName(specie)}</div>
                       <img
                         alt="image"
-                        width={300}
+                        className="w-[250px] md:w-[300px]"
                         src={pokemon?.sprites.other["official-artwork"].front_default}
                       />
                     </div>

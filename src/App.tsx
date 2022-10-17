@@ -80,15 +80,18 @@ export function App() {
 
   return (
     <Spin spinning={loading}>
-      <div className="grid md:grid-cols-4 sm:grid-cols-2 gap-6">
-        {pokemons.map((pokemon) => (
-          <Card key={pokemon.name} pokemon={pokemon} onClick={() => onCardClick(pokemon)} />
-        ))}
-      </div>
-      {!pokemons.length && <Empty />}
+      <div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 min-h-[calc(100vh-208px)]">
+          {pokemons.map((pokemon) => (
+            <Card key={pokemon.name} pokemon={pokemon} onClick={() => onCardClick(pokemon)} />
+          ))}
+        </div>
 
-      <div className="mt-8 flex justify-center">
-        <Pagination {...pagination} onChange={onPageChanged} />
+        {!pokemons.length && <Empty />}
+
+        <div className="mt-8 flex justify-center">
+          <Pagination {...pagination} onChange={onPageChanged} />
+        </div>
       </div>
 
       <Modal
