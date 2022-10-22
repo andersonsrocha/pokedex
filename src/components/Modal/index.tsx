@@ -20,14 +20,14 @@ export function Modal({ open, pokemon, onClose, onClick }: Props) {
   const [loading, setLoading] = useState(false);
   const [tab, setTab] = useState("about");
 
-  const onCloseOnEscapeKeyDown = (e: KeyboardEvent) => {
+  const closeOnEscapeKeyDown = (e: KeyboardEvent) => {
     if (onClose && (e.code || e.key) === "Escape") {
-      document.body.classList.remove("overflow-hidden");
+      // document.body.classList.remove("overflow-hidden");
       onClose();
     }
   };
 
-  const onCloseOnClick = () => {
+  const closeOnClick = () => {
     if (onClose) {
       document.body.classList.remove("overflow-hidden");
       onClose();
@@ -89,11 +89,11 @@ export function Modal({ open, pokemon, onClose, onClick }: Props) {
   };
 
   useEffect(() => {
-    document.body.addEventListener("keydown", onCloseOnEscapeKeyDown);
-    if (open) document.body.classList.add("overflow-hidden");
+    document.body.addEventListener("keydown", closeOnEscapeKeyDown);
+    // if (open) document.body.classList.add("overflow-hidden");
 
     return function cleanup() {
-      document.body.removeEventListener("keydown", onCloseOnEscapeKeyDown);
+      document.body.removeEventListener("keydown", closeOnEscapeKeyDown);
     };
   }, [open]);
 
@@ -120,140 +120,139 @@ export function Modal({ open, pokemon, onClose, onClick }: Props) {
   }, [pokemon]);
 
   return (
-    <Fragment>
-      {pokemon && specie && (
+    <div
+      className={classNames("modal transition-all duration-500 pointer-events-none", {
+        "opacity-0": !open,
+        "opacity-100": open,
+      })}
+    >
+      <div className="overlay fixed inset-0 w-full h-full z-30 bg-black/30" />
+
+      <div
+        onClick={closeOnClick}
+        className={classNames(
+          "modal-content z-40 fixed inset-0 flex justify-center items-center w-full h-full",
+          { "pointer-events-none": !open, "pointer-events-auto": open }
+        )}
+      >
         <div
-          onClick={onCloseOnClick}
-          className={classNames(
-            "bg-brand-500/50 fixed left-0 top-0 right-0 bottom-0 flex items-center justify-center z-40",
-            { hidden: !open, block: open }
-          )}
+          onClick={(e) => e.stopPropagation()}
+          className="modal-body bg-brand-500 rounded-lg text-white shadow-lg shadow-black relative z-50 w-[90vw] md:w-[800px] md:h-[300px]"
         >
-          <div
-            onClick={(e) => e.stopPropagation()}
-            className="duration-500 animate-in fade-in zoom-in"
-          >
-            <div className="w-[90vw] md:w-[800px] md:h-[300px] bg-brand-500 rounded-lg text-white shadow-lg shadow-black">
-              <Spin spinning={loading}>
-                <div className="flex justify-end w-full">
-                  <button
-                    onClick={onCloseOnClick}
-                    className="absolute m-2 flex justify-center items-center w-8 h-8 bg-brand-100 rounded-full text-white hover:bg-white/50"
-                  >
-                    <CloseOutline />
-                  </button>
+          <Spin spinning={loading}>
+            <div className="flex justify-end w-full">
+              <button
+                onClick={closeOnClick}
+                className="absolute m-2 flex justify-center items-center w-8 h-8 bg-brand-100 rounded-full text-white hover:bg-white/10"
+              >
+                <CloseOutline />
+              </button>
+            </div>
+
+            {pokemon && specie && (
+              <div className="grid grid-cols-1 grid-rows-2 md:grid-cols-[300px_auto] md:grid-rows-1 h-full">
+                <div className={`p-4 rounded-l-lg bg-gradient-to-br ${getGradientClassName(0)}`}>
+                  <div className="flex items-center">
+                    <div className="font-bold text-3xl opacity-75">{getPokemonName(specie)}</div>
+                    <img
+                      alt="image"
+                      className="w-[250px] md:w-[300px] ml-3"
+                      src={pokemon?.sprites.other["official-artwork"].front_default}
+                    />
+                  </div>
                 </div>
 
-                <div className="grid grid-cols-1 grid-rows-2 md:grid-rows-1 md:grid-cols-[300px_auto] h-full">
-                  <div
-                    className={`rounded-t-lg md:rounded-l-lg md:rounded-r-none bg-gradient-to-br ${getGradientClassName(
-                      0
-                    )}`}
-                  >
-                    <div className="flex items-center p-4">
-                      <div className="font-bold text-4xl opacity-75">{getPokemonName(specie)}</div>
-                      <img
-                        alt="image"
-                        className="w-[250px] md:w-[300px]"
-                        src={pokemon?.sprites.other["official-artwork"].front_default}
-                      />
-                    </div>
+                <div className="p-4">
+                  <div className="text-sm font-medium text-center text-white border-b border-divide">
+                    <ul className="flex flex-wrap -mb-px">
+                      <li className="teste mr-2">
+                        <button
+                          onClick={() => setTab("about")}
+                          className={classNames(
+                            "inline-block p-4 rounded-t-lg border-transparent hover:text-white/50 hover:border-white/50",
+                            { "border-b-2 border-b-white": tab == "about" }
+                          )}
+                        >
+                          About
+                        </button>
+                      </li>
+
+                      <li className="teste mr-2">
+                        <button
+                          onClick={() => setTab("info")}
+                          className={classNames(
+                            "inline-block p-4 rounded-t-lg border-transparent hover:text-white/50 hover:border-white/50",
+                            { "border-b-2 border-b-white": tab == "info" }
+                          )}
+                        >
+                          Info
+                        </button>
+                      </li>
+
+                      <li className="mr-2">
+                        <button
+                          onClick={() => setTab("evolution")}
+                          className={classNames(
+                            "inline-block p-4 rounded-t-lg border-transparent hover:text-white/50 hover:border-white/50",
+                            { "border-b-2 border-b-white": tab == "evolution" }
+                          )}
+                        >
+                          Evolution
+                        </button>
+                      </li>
+                    </ul>
                   </div>
 
-                  <div className="p-4">
-                    <div className="text-sm font-medium text-center text-white border-b border-divide">
-                      <ul className="flex flex-wrap -mb-px">
-                        <li className="teste mr-2">
-                          <button
-                            onClick={() => setTab("about")}
-                            className={classNames(
-                              "inline-block p-4 rounded-t-lg border-transparent hover:text-white/50 hover:border-white/50",
-                              { "border-b-2": tab == "about" }
-                            )}
-                          >
-                            About
-                          </button>
-                        </li>
+                  <div className="px-3 flex flex-col gap-4 mt-4 text-sm font-thin h-[200px] overflow-x-hidden overflow-y-auto md:overflow-visible">
+                    {tab == "about" && <div>{getPokemonDescription(specie)}</div>}
 
-                        <li className="teste mr-2">
-                          <button
-                            onClick={() => setTab("info")}
-                            className={classNames(
-                              "inline-block p-4 rounded-t-lg border-transparent hover:text-white/50 hover:border-white/50",
-                              { "border-b-2": tab == "info" }
-                            )}
-                          >
-                            Info
-                          </button>
-                        </li>
+                    {tab == "info" && (
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-1">
+                        <div className="grid grid-cols-12 gap-1">
+                          <div className="font-bold col-span-6 md:col-span-4">Specie</div>
+                          <div className="col-span-6 md:col-span-8">{getPokemonGenera(specie)}</div>
 
-                        <li className="mr-2">
-                          <button
-                            onClick={() => setTab("evolution")}
-                            className={classNames(
-                              "inline-block p-4 rounded-t-lg border-transparent hover:text-white/50 hover:border-white/50",
-                              { "border-b-2": tab == "evolution" }
-                            )}
-                          >
-                            Evolution
-                          </button>
-                        </li>
-                      </ul>
-                    </div>
+                          <div className="font-bold col-span-6 md:col-span-4">Height</div>
+                          <div className="col-span-6 md:col-span-8">{pokemon.height / 10}m</div>
 
-                    <div className="flex flex-col gap-4 mt-4 text-sm font-thin h-[200px] overflow-x-hidden overflow-y-auto md:overflow-visible">
-                      {tab == "about" && <div>{getPokemonDescription(specie)}</div>}
+                          <div className="font-bold col-span-6 md:col-span-4">Weight</div>
+                          <div className="col-span-6 md:col-span-8">{pokemon.weight / 10}kg</div>
 
-                      {tab == "info" && (
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-1">
-                          <div className="grid grid-cols-12 gap-1">
-                            <div className="font-bold col-span-6 md:col-span-4">Specie</div>
-                            <div className="col-span-6 md:col-span-8">
-                              {getPokemonGenera(specie)}
-                            </div>
-
-                            <div className="font-bold col-span-6 md:col-span-4">Height</div>
-                            <div className="col-span-6 md:col-span-8">{pokemon.height / 10}m</div>
-
-                            <div className="font-bold col-span-6 md:col-span-4">Weight</div>
-                            <div className="col-span-6 md:col-span-8">{pokemon.weight / 10}kg</div>
-
-                            <div className="font-bold col-span-6 md:col-span-4">Abilities</div>
-                            <div className="col-span-6 md:col-span-8 capitalize">
-                              {pokemon.abilities.map((x) => x.ability.name).join(", ")}
-                            </div>
-                          </div>
-
-                          <div className="grid grid-cols-12 gap-1">
-                            <div className="font-bold col-span-6">Base Exp</div>
-                            <div className="col-span-6">{pokemon.base_experience}</div>
-
-                            <div className="font-bold col-span-6">Base Happiness</div>
-                            <div className="col-span-6">{specie.base_happiness}</div>
-
-                            <div className="font-bold col-span-6">Catch Rate</div>
-                            <div className="col-span-6">{`${(
-                              (specie.capture_rate / 255) *
-                              100
-                            ).toFixed(1)}%`}</div>
-
-                            <div className="font-bold col-span-6">Growth Rate</div>
-                            <div className="col-span-6 capitalize">{specie.growth_rate.name}</div>
+                          <div className="font-bold col-span-6 md:col-span-4">Abilities</div>
+                          <div className="col-span-6 md:col-span-8 capitalize">
+                            {pokemon.abilities.map((x) => x.ability.name).join(", ")}
                           </div>
                         </div>
-                      )}
 
-                      {tab == "evolution" && evolution && (
-                        <Evolution chain={evolution} onClick={onClick} />
-                      )}
-                    </div>
+                        <div className="grid grid-cols-12 gap-1">
+                          <div className="font-bold col-span-6">Base Exp</div>
+                          <div className="col-span-6">{pokemon.base_experience}</div>
+
+                          <div className="font-bold col-span-6">Base Happiness</div>
+                          <div className="col-span-6">{specie.base_happiness}</div>
+
+                          <div className="font-bold col-span-6">Catch Rate</div>
+                          <div className="col-span-6">{`${(
+                            (specie.capture_rate / 255) *
+                            100
+                          ).toFixed(1)}%`}</div>
+
+                          <div className="font-bold col-span-6">Growth Rate</div>
+                          <div className="col-span-6 capitalize">{specie.growth_rate.name}</div>
+                        </div>
+                      </div>
+                    )}
+
+                    {tab == "evolution" && evolution && (
+                      <Evolution chain={evolution} onClick={onClick} />
+                    )}
                   </div>
                 </div>
-              </Spin>
-            </div>
-          </div>
+              </div>
+            )}
+          </Spin>
         </div>
-      )}
-    </Fragment>
+      </div>
+    </div>
   );
 }
