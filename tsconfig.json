@@ -21,7 +21,8 @@
       "@utils": ["src/utils/index"],
       "@assets": ["src/assets"],
       "@types": ["src/types/index"],
-      "@icons": ["src/icons/index"]
+      "@icons": ["src/icons/index"],
+      "@constants": ["src/constants/index"]
     }
   },
   "include": ["src"],

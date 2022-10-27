@@ -1,1 +1,1 @@
-export { ReactComponent as FireOutline } from "@assets/fire.svg";
+export { ReactComponent as FireOutline } from "@assets/icons/fire.svg";

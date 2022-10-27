@@ -1,1 +1,1 @@
-export { ReactComponent as FlyingOutline } from "@assets/flying.svg";
+export { ReactComponent as FlyingOutline } from "@assets/icons/flying.svg";

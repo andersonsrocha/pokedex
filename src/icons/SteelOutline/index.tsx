@@ -1,1 +1,1 @@
-export { ReactComponent as SteelOutline } from "@assets/steel.svg";
+export { ReactComponent as SteelOutline } from "@assets/icons/steel.svg";

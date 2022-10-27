@@ -1,1 +1,1 @@
-export { ReactComponent as IceOutline } from "@assets/ice.svg";
+export { ReactComponent as IceOutline } from "@assets/icons/ice.svg";

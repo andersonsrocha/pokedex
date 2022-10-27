@@ -32,7 +32,7 @@ export function Spin({ spinning, children }: Props) {
               ></path>
             </svg>
           </div>
-          <div className="blur-sm bg-brand-500/50 w-full">{children}</div>
+          <div className="blur-sm w-full">{children}</div>
         </div>
       )}
 

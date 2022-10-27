@@ -23,12 +23,12 @@ export function Header({ onChange }: Props) {
 
   return (
     <div>
-      <div className="fixed z-10 flex h-16 w-full px-4 py-2 gap-2 bg-brand-500 justify-between items-center shadow-md md:px-20 md:gap-0">
+      <div className="fixed z-10 flex h-16 w-full max-w-[100vw] px-4 py-2 gap-2 bg-brand-500 justify-between items-center shadow-md md:px-20 md:gap-0">
         <a href="/" className="w-32 hidden md:block">
           <Logo />
         </a>
 
-        <div className="relative text-white flex-1 max-w-md">
+        <div className="relative text-white flex-1 w-full md:max-w-md">
           <form onSubmit={onSubmit} autoComplete="off">
             <div className="flex absolute inset-y-0 left-0 items-center pl-3 pointer-events-none">
               <SearchOutline />

@@ -1,1 +1,1 @@
-export { ReactComponent as EmptyOutline } from "@assets/empty.svg";
+export { ReactComponent as EmptyOutline } from "@assets/icons/empty.svg";

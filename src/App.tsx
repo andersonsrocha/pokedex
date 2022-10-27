@@ -1,22 +1,23 @@
 import { useContext, useEffect, useState } from "react";
 import {
   Card,
+  Drawer,
   Empty,
-  Modal,
   PageChangeEvent,
   Pagination,
   PaginationProps,
-  Skeleton,
   Spin,
+  View,
 } from "@components";
 
 import { LayoutContext } from "./layout";
 
-import { Description, Genera, Pokemon } from "@types";
+import { Pokemon } from "@types";
 
 export function App() {
   const { search } = useContext(LayoutContext);
 
+  const [expand, setExpand] = useState(false);
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [pokemon, setPokemon] = useState<Pokemon>();
@@ -39,11 +40,16 @@ export function App() {
 
   const onCardClick = (pokemon: Pokemon) => {
     setOpen(true);
+    setExpand(true);
     setPokemon(pokemon);
   };
 
   const onPageChanged = ({ pageNumber, pageSize }: PageChangeEvent) => {
     setPagination((pag) => ({ ...pag, pageNumber, pageSize }));
+  };
+
+  const onDrawerClose = () => {
+    setOpen(false);
   };
 
   useEffect(() => {
@@ -54,7 +60,7 @@ export function App() {
     (async () => {
       setLoading(true);
 
-      const { pageNumber, pageSize = 20 } = pagination;
+      const { pageNumber, pageSize = 21 } = pagination;
 
       const url = search
         ? `https://pokeapi.co/api/v2/pokemon-species?limit=10000`
@@ -81,10 +87,18 @@ export function App() {
   return (
     <Spin spinning={loading}>
       <div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 min-h-[calc(100vh-208px)]">
-          {pokemons.map((pokemon) => (
-            <Card key={pokemon.name} pokemon={pokemon} onClick={() => onCardClick(pokemon)} />
-          ))}
+        <div className="grid grid-cols-12 gap-6 min-h-[calc(100vh-208px)]">
+          <div className="col-span-12 xl:col-span-9">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              {pokemons.map((pokemon) => (
+                <Card key={pokemon.name} pokemon={pokemon} onClick={() => onCardClick(pokemon)} />
+              ))}
+            </div>
+          </div>
+
+          <div className="col-span-3 hidden xl:block">
+            <View pokemon={pokemon} />
+          </div>
         </div>
 
         {!pokemons.length && <Empty />}
@@ -94,12 +108,9 @@ export function App() {
         </div>
       </div>
 
-      <Modal
-        open={open}
-        pokemon={pokemon}
-        onClose={() => setOpen(false)}
-        onClick={(pokemon) => setPokemon(pokemon)}
-      />
+      <Drawer expanded={expand} open={open} onChange={setExpand} onClose={onDrawerClose}>
+        <View pokemon={pokemon} />
+      </Drawer>
     </Spin>
   );
 }

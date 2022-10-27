@@ -1,1 +1,1 @@
-export { ReactComponent as PsychicOutline } from "@assets/psychic.svg";
+export { ReactComponent as PsychicOutline } from "@assets/icons/psychic.svg";

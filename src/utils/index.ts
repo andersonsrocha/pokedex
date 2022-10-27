@@ -1,6 +1,8 @@
 import { Pokemon, Typing } from "@types";
 import * as Icons from "@icons";
 
+export * from "./modifiers";
+
 export function getType(pokemon: Pokemon, pos = 0) {
   const { types } = pokemon;
   return types[pos].type.name;

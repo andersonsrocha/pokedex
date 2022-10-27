@@ -1,1 +1,1 @@
-export { ReactComponent as GithubOutline } from "@assets/github.svg";
+export { ReactComponent as GithubOutline } from "@assets/icons/github.svg";

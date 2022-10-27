@@ -1,1 +1,1 @@
-export { ReactComponent as LinkedinOutline } from "@assets/linkedin.svg";
+export { ReactComponent as LinkedinOutline } from "@assets/icons/linkedin.svg";

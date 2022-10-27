@@ -1,1 +1,1 @@
-export { ReactComponent as FairyOutline } from "@assets/fairy.svg";
+export { ReactComponent as FairyOutline } from "@assets/icons/fairy.svg";

@@ -1,1 +1,1 @@
-export { ReactComponent as WaterOutline } from "@assets/water.svg";
+export { ReactComponent as WaterOutline } from "@assets/icons/water.svg";

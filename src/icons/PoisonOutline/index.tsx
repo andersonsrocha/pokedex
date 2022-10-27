@@ -1,1 +1,1 @@
-export { ReactComponent as PoisonOutline } from "@assets/poison.svg";
+export { ReactComponent as PoisonOutline } from "@assets/icons/poison.svg";

@@ -1,1 +1,1 @@
-export { ReactComponent as ArrowDownOutline } from "@assets/arrow_down.svg";
+export { ReactComponent as ArrowDownOutline } from "@assets/icons/arrow_down.svg";

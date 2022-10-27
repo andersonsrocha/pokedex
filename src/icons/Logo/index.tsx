@@ -1,1 +1,1 @@
-export { ReactComponent as Logo } from "@assets/logo.svg";
+export { ReactComponent as Logo } from "@assets/icons/logo.svg";

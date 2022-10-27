@@ -1,1 +1,1 @@
-export { ReactComponent as HeightOutline } from "@assets/height.svg";
+export { ReactComponent as HeightOutline } from "@assets/icons/height.svg";

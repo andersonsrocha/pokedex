@@ -1,0 +1,1 @@
+export const MAX_DRAWER_HEIGHT_PERCENT = 0.85;

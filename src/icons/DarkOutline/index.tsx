@@ -1,1 +1,1 @@
-export { ReactComponent as DarkOutline } from "@assets/dark.svg";
+export { ReactComponent as DarkOutline } from "@assets/icons/dark.svg";

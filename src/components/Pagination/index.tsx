@@ -15,7 +15,7 @@ export type PaginationProps = {
 };
 
 export function Pagination(props: PaginationProps) {
-  const { count, onChange, pageSize = 20 } = props;
+  const { count, onChange, pageSize = 21 } = props;
 
   const [current, setCurrent] = useState(props.pageNumber);
 

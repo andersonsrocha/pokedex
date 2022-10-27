@@ -1,1 +1,1 @@
-export { ReactComponent as FightingOutline } from "@assets/fighting.svg";
+export { ReactComponent as FightingOutline } from "@assets/icons/fighting.svg";

@@ -1,10 +1,8 @@
-import React, { useContext, useEffect, useState, MouseEvent } from "react";
+import React, { useEffect, useState, MouseEvent } from "react";
 import { getType, getTypeIcon } from "@utils";
-import { Spin, Stats } from "@components";
+import { Img, Spin, Stats } from "@components";
 import { WeightOutline, HeightOutline } from "@icons";
 import classNames from "classnames";
-
-import { LayoutContext } from "../../layout";
 
 import { Pokemon, Specie } from "@types";
 
@@ -20,8 +18,6 @@ export function Card(props: Props) {
   const [variety, setVariety] = useState(0);
   const [pokemon, setPokemon] = useState<Pokemon>(poke);
   const [specie, setSpecie] = useState<Specie>();
-
-  const { v } = useContext(LayoutContext);
 
   const pokeNumber = String(pokemon.id).padStart(3, "0");
   const typeLen = pokemon.types.length;
@@ -80,6 +76,17 @@ export function Card(props: Props) {
     return `${height / 10} m`;
   };
 
+  const getSprite = (pokemon: Pokemon, form?: number) => {
+    let sprite = pokemon.sprites.other["official-artwork"].front_default;
+    if (!sprite && form) {
+      const number = String(pokemon.id).padStart(3, "0");
+      const endpoint = `${number}_f${form}`;
+      sprite = `https://assets.pokemon.com/assets/cms2/img/pokedex/full/${endpoint}.png`;
+    }
+
+    return sprite;
+  };
+
   const onVarietyChanged = async (e: MouseEvent, oldIndex: number) => {
     e.stopPropagation();
 
@@ -125,7 +132,7 @@ export function Card(props: Props) {
               )}`}
             >
               <div className="text-white p-2 flex flex-col items-center">
-                {specie.varieties.length > 1 && (
+                {specie.forms_switchable && (
                   <div className="relative w-full">
                     <button
                       title="Transform"
@@ -137,17 +144,13 @@ export function Card(props: Props) {
                   </div>
                 )}
 
-                <div className="font-extrabold">{`#${pokeNumber}`}</div>
+                <div className="font-extrabold text-white/70">{`#${pokeNumber}`}</div>
 
                 <div className="h-[100px]">
-                  <img
-                    alt="poke"
-                    width={100}
-                    src={pokemon.sprites.other[v == 1 ? "official-artwork" : "home"].front_default}
-                  />
+                  <Img alt="poke" width={100} src={getSprite(pokemon)} />
                 </div>
 
-                <div className="capitalize">{pokemon.name}</div>
+                <div className="capitalize text-white/70">{pokemon.name}</div>
               </div>
 
               <div className="bg-white text-sm shadow-2xl flex flex-col gap-4 flex-1 rounded-t-2xl rounded-b-lg p-4">
@@ -179,42 +182,42 @@ export function Card(props: Props) {
 
                 <div>
                   <div className="grid grid-cols-12 items-center">
-                    <div className="col-span-3">HP</div>
+                    <div className="col-span-3 font-bold">HP</div>
                     <div className="col-span-2">{pokemon.stats[0].base_stat}</div>
                     <div className="col-span-7">
                       <Stats value={pokemon.stats[0].base_stat} />
                     </div>
                   </div>
                   <div className="grid grid-cols-12 items-center">
-                    <div className="col-span-3">Attack</div>
+                    <div className="col-span-3 font-bold">Attack</div>
                     <div className="col-span-2">{pokemon.stats[1].base_stat}</div>
                     <div className="col-span-7">
                       <Stats value={pokemon.stats[1].base_stat} />
                     </div>
                   </div>
                   <div className="grid grid-cols-12 items-center">
-                    <div className="col-span-3">Defense</div>
+                    <div className="col-span-3 font-bold">Defense</div>
                     <div className="col-span-2">{pokemon.stats[2].base_stat}</div>
                     <div className="col-span-7">
                       <Stats value={pokemon.stats[2].base_stat} />
                     </div>
                   </div>
                   <div className="grid grid-cols-12 items-center">
-                    <div className="col-span-3">Sp. Atk</div>
+                    <div className="col-span-3 font-bold">Sp. Atk</div>
                     <div className="col-span-2">{pokemon.stats[3].base_stat}</div>
                     <div className="col-span-7">
                       <Stats value={pokemon.stats[3].base_stat} />
                     </div>
                   </div>
                   <div className="grid grid-cols-12 items-center">
-                    <div className="col-span-3">Sp. Def</div>
+                    <div className="col-span-3 font-bold">Sp. Def</div>
                     <div className="col-span-2">{pokemon.stats[4].base_stat}</div>
                     <div className="col-span-7">
                       <Stats value={pokemon.stats[4].base_stat} />
                     </div>
                   </div>
                   <div className="grid grid-cols-12 items-center">
-                    <div className="col-span-3">Speed</div>
+                    <div className="col-span-3 font-bold">Speed</div>
                     <div className="col-span-2">{pokemon.stats[5].base_stat}</div>
                     <div className="col-span-7">
                       <Stats value={pokemon.stats[5].base_stat} />

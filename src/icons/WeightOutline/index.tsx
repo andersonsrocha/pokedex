@@ -1,1 +1,1 @@
-export { ReactComponent as WeightOutline } from "@assets/weight.svg";
+export { ReactComponent as WeightOutline } from "@assets/icons/weight.svg";

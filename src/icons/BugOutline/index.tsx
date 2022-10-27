@@ -1,1 +1,1 @@
-export { ReactComponent as BugOutline } from "@assets/bug.svg";
+export { ReactComponent as BugOutline } from "@assets/icons/bug.svg";

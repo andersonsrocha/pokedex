@@ -1,1 +1,1 @@
-export { ReactComponent as CloseOutline } from "@assets/close.svg";
+export { ReactComponent as CloseOutline } from "@assets/icons/close.svg";

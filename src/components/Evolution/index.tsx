@@ -1,8 +1,7 @@
 import { Fragment, useEffect, useState } from "react";
 import { ArrowRightOutline, ArrowDownOutline } from "@icons";
-import classNames from "classnames";
 
-import { Spin } from "../Spin";
+import { Spin, Img } from "..";
 
 import { Chain, Pokemon } from "@types";
 
@@ -50,46 +49,22 @@ export function Evolution({ chain, onClick }: Props) {
 
   return (
     <Spin spinning={loading}>
-      <div className="flex flex-col md:flex-row justify-center gap-3 items-center">
+      <div className="flex justify-between items-center">
         {evolution.map((pokes, index) => (
           <Fragment key={index}>
-            <div className="min-w-[100px] grid grid-cols-12 gap-2">
+            <div className="flex">
               {pokes.map((poke, index) => (
-                <div
-                  key={index}
-                  onClick={() => onClick?.(poke)}
-                  className={classNames("w-ful hover:scale-105 hover:z-50", {
-                    "scale-[0.65]": pokes.length > 1,
-                    "col-span-12": pokes.length == 1,
-                    "col-span-6": pokes.length == 2,
-                    "col-span-4": pokes.length == 3,
-                    "col-span-3 scale-[0.65] h-[90px]": pokes.length > 3,
-                  })}
-                >
-                  <div className="bg-brand-100 flex justify-center mt-[88px] text-center rounded-md relative w-full px-1 pt-2 pb-1 cursor-pointer border-2 border-white shadow-md shadow-black">
-                    <div className="capitalize">{poke.name}</div>
-                    <div className="bg-brand-100 absolute flex justify-center items-center w-24 h-24 rounded-full -top-[90px] border-2 border-white">
-                      <img
-                        width={80}
-                        src={poke.sprites.other["official-artwork"].front_default}
-                        alt="icon"
-                      />
-                    </div>
-                  </div>
+                <div key={index} className="w-full">
+                  <Img
+                    width={60}
+                    src={poke.sprites.other["official-artwork"].front_default}
+                    alt="icon"
+                  />
                 </div>
               ))}
             </div>
 
-            {index != evolution.length - 1 && (
-              <div>
-                <div className="text-[300%] hidden md:block">
-                  <ArrowRightOutline />
-                </div>
-                <div className="text-[300%] block md:hidden">
-                  <ArrowDownOutline />
-                </div>
-              </div>
-            )}
+            {index != evolution.length - 1 && <ArrowRightOutline />}
           </Fragment>
         ))}
       </div>

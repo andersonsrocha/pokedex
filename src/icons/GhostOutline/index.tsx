@@ -1,1 +1,1 @@
-export { ReactComponent as GhostOutline } from "@assets/ghost.svg";
+export { ReactComponent as GhostOutline } from "@assets/icons/ghost.svg";

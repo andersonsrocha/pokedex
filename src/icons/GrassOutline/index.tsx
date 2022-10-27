@@ -1,1 +1,1 @@
-export { ReactComponent as GrassOutline } from "@assets/grass.svg";
+export { ReactComponent as GrassOutline } from "@assets/icons/grass.svg";

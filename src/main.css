@@ -1,3 +1,34 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* drawer content */
+.drawer-content {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: 500px;
+  max-height: var(--max-height);
+  transition: transform 200ms ease;
+  transform: translate3d(0, calc(100% - 40px + var(--transform, 0px)), 0);
+}
+
+.drawer-content.dragging {
+  transition: none;
+}
+
+.drawer-content:after {
+  content: "";
+  display: block;
+  position: absolute;
+  bottom: 1px;
+  width: 100%;
+  height: 100%;
+  transform: translateY(100%);
+  background-color: #232323;
+}
+
+.drawer-content.expanded {
+  transform: translate3d(0, var(--transform), 0);
+}

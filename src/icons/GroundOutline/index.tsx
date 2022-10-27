@@ -1,1 +1,1 @@
-export { ReactComponent as GroundOutline } from "@assets/ground.svg";
+export { ReactComponent as GroundOutline } from "@assets/icons/ground.svg";

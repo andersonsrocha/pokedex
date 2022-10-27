@@ -1,1 +1,1 @@
-export { ReactComponent as NormalOutline } from "@assets/normal.svg";
+export { ReactComponent as NormalOutline } from "@assets/icons/normal.svg";

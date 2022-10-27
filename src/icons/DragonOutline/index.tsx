@@ -1,1 +1,1 @@
-export { ReactComponent as DragonOutline } from "@assets/dragon.svg";
+export { ReactComponent as DragonOutline } from "@assets/icons/dragon.svg";

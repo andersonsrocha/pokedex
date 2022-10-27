@@ -1,1 +1,1 @@
-export { ReactComponent as ElectricOutline } from "@assets/electric.svg";
+export { ReactComponent as ElectricOutline } from "@assets/icons/electric.svg";

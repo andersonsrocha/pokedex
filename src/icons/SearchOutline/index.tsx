@@ -1,1 +1,1 @@
-export { ReactComponent as SearchOutline } from "@assets/search.svg";
+export { ReactComponent as SearchOutline } from "@assets/icons/search.svg";

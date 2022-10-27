@@ -32,6 +32,10 @@ export default defineConfig({
         find: "@icons",
         replacement: path.resolve(__dirname, "./src/icons"),
       },
+      {
+        find: "@constants",
+        replacement: path.resolve(__dirname, "./src/constants"),
+      },
     ],
   },
 });

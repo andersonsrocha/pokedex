@@ -31,14 +31,17 @@ export interface Pokemon {
 }
 
 export interface Specie {
+  id: number;
   base_happiness: number;
   capture_rate: number;
   varieties: Array<Variety>;
   evolution_chain: Chain;
   flavor_text_entries: Array<Description>;
+  forms_switchable: boolean;
   names: Array<Language>;
   genera: Array<Genera>;
   growth_rate: Record<"name" | "url", string>;
+  has_gender_differences: boolean;
 }
 
 export interface Variety {
@@ -55,7 +58,7 @@ export interface Stats {
 }
 
 export interface Sprite {
-  other: Record<"official-artwork" | "home", Record<"front_default", string>>;
+  other: Record<"official-artwork" | "home", Record<"front_default" | "front_female", string>>;
 }
 
 export interface Language {
