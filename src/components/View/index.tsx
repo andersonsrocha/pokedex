@@ -17,7 +17,8 @@ export function View({ pokemon: poke }: Props) {
   const [pokemon, setPokemon] = useState<Pokemon>();
   const [specie, setSpecie] = useState<Specie>();
   const [evolution, setEvolution] = useState<Chain>();
-  const [gender, setGender] = useState(false);
+  const [male, setMale] = useState(false);
+  const [female, setFemale] = useState(false);
   const [loading, setLoading] = useState(false);
 
   const getGradientClassName = (position: number) => {
@@ -92,37 +93,30 @@ export function View({ pokemon: poke }: Props) {
   const getSprite = (pokemon: Pokemon, genre: number) => {
     let sprite = "";
 
-    // se forma for feminina
-    if (
-      specie &&
-      genre > 1 &&
-      specie.has_gender_differences &&
-      !specie.forms_switchable &&
-      specie.varieties.length < 2
-    ) {
-      const number = String(pokemon.id).padStart(3, "0");
-      const endpoint = `${number}_f${genre}`;
-      sprite = `https://assets.pokemon.com/assets/cms2/img/pokedex/full/${endpoint}.png`;
-    } else if (
-      specie &&
-      genre > 1 &&
-      specie.has_gender_differences &&
-      !specie.forms_switchable &&
-      specie.varieties.length > 1
-    ) {
-      const url = specie.varieties[genre - 1].pokemon.url;
-      const split = url.split("/");
+    if (specie) {
+      const { varieties } = specie;
+      const names = varieties.map((v) => v.pokemon.name);
+      const female = names.some((name) => name.includes("female"));
 
-      const oldNumber = String(pokemon.id);
-      let newNumber = split[split.length - 1];
+      if (genre == 2 && female) {
+        const url = specie.varieties[genre - 1].pokemon.url;
+        const split = url.split("/");
 
-      if (url.endsWith("/")) newNumber = split[split.length - 2];
+        const oldNumber = String(pokemon.id);
+        let newNumber = split[split.length - 1];
 
-      const image = pokemon.sprites.other["official-artwork"].front_default;
-      sprite = image.replace(oldNumber, newNumber);
-    } else {
-      // caso não, retorna a forma padrão
-      sprite = pokemon.sprites.other["official-artwork"].front_default;
+        if (url.endsWith("/")) newNumber = split[split.length - 2];
+
+        const image = pokemon.sprites.other["official-artwork"].front_default;
+        sprite = image.replace(oldNumber, newNumber);
+      } else if (genre == 2 && male && female && varieties.length < 2) {
+        const number = String(pokemon.id).padStart(3, "0");
+        const endpoint = `${number}_f${genre}`;
+        sprite = `https://assets.pokemon.com/assets/cms2/img/pokedex/full/${endpoint}.png`;
+      } else {
+        // caso não, retorna a forma padrão
+        sprite = pokemon.sprites.other["official-artwork"].front_default;
+      }
     }
 
     // se sprite for nula busca em outro banco de dados
@@ -135,16 +129,21 @@ export function View({ pokemon: poke }: Props) {
   };
 
   const onGenreChanged = async (genre: 1 | 2) => {
-    if (specie && gender) {
+    if (specie) {
       const { varieties } = specie;
-      setLoading(true);
+      const names = varieties.map((v) => v.pokemon.name);
+      const female = names.some((name) => name.includes("female"));
 
-      const url = varieties[genre - 1].pokemon.url;
-      const request = await fetch(url);
-      const response = await request.json();
+      if (female) {
+        setLoading(true);
 
-      setPokemon(response);
-      setLoading(false);
+        const url = varieties[genre - 1].pokemon.url;
+        const request = await fetch(url);
+        const response = await request.json();
+
+        setPokemon(response);
+        setLoading(false);
+      }
     }
 
     setGenre(genre);
@@ -167,9 +166,16 @@ export function View({ pokemon: poke }: Props) {
           setEvolution(undefined);
         }
 
-        const { varieties } = specie;
-        const names = varieties.map((v) => v.pokemon.name);
-        setGender(names.some((name) => name.includes("female")));
+        if (specie.gender_rate !== -1) {
+          const { varieties } = specie;
+          const names = varieties.map((v) => v.pokemon.name);
+          const female = names.some((name) => name.includes("female"));
+          const rate = (specie.gender_rate / 8) * 100;
+
+          setFemale(rate !== 0 || female);
+          setMale(100 - rate !== 0);
+          setGenre(Math.ceil(rate / 100) + 1);
+        }
 
         setPokemon(poke);
         setSpecie(specie);
@@ -218,38 +224,53 @@ export function View({ pokemon: poke }: Props) {
                 </ul>
               </div>
 
-              {(specie.has_gender_differences || gender) && (
+              {specie.gender_rate > -1 && (
                 <div className="absolute top-0 right-0">
                   <div
                     className={classNames(
                       "absolute duration-500 w-10 h-full transition-all right-8 rotate-180 -z-10",
-                      { "top-0": genre === 1, "top-8": genre === 2 }
+                      { "-top-1": genre === 1, "top-8": genre === 2 }
                     )}
                   >
                     <WaveOutline />
                   </div>
 
                   <ul className="flex flex-col gap-2 w-8 px-1 py-5 bg-white/20 rounded-3xl">
-                    <li onClick={() => onGenreChanged(1)} className="cursor-pointer">
+                    <li className="cursor-pointer">
                       <div
                         className={classNames("w-6 duration-400 transition-all", {
                           "-ml-1": genre === 1,
                         })}
                       >
-                        <div className="w-6 border border-blue-800 bg-blue-400 rounded-full p-0.5">
+                        <button
+                          disabled={!male}
+                          onClick={() => onGenreChanged(1)}
+                          className={classNames(
+                            "w-6 border rounded-full p-0.5 border-blue-800 bg-blue-400",
+                            { "cursor-not-allowed opacity-50": !male, "opacity-100": male }
+                          )}
+                        >
                           <MaleOutline />
-                        </div>
+                        </button>
                       </div>
                     </li>
-                    <li onClick={() => onGenreChanged(2)} className="cursor-pointer">
+
+                    <li className="cursor-pointer">
                       <div
                         className={classNames("w-6 duration-400 transition-all", {
                           "-ml-1": genre === 2,
                         })}
                       >
-                        <div className="border border-pink-800 bg-pink-400 rounded-full p-0.5">
+                        <button
+                          disabled={!female}
+                          onClick={() => onGenreChanged(2)}
+                          className={classNames(
+                            "border border-pink-800 bg-pink-400 rounded-full p-0.5",
+                            { "cursor-not-allowed opacity-50": !female, "opacity-100": female }
+                          )}
+                        >
                           <FemaleOutline />
-                        </div>
+                        </button>
                       </div>
                     </li>
                   </ul>
