@@ -11,11 +11,13 @@ type Props = {
   pokemon?: Pokemon;
 };
 
-export function View({ pokemon }: Props) {
+export function View({ pokemon: poke }: Props) {
   const [tab, setTab] = useState(0);
   const [genre, setGenre] = useState(1);
+  const [pokemon, setPokemon] = useState<Pokemon>();
   const [specie, setSpecie] = useState<Specie>();
   const [evolution, setEvolution] = useState<Chain>();
+  const [gender, setGender] = useState(false);
   const [loading, setLoading] = useState(false);
 
   const getGradientClassName = (position: number) => {
@@ -91,10 +93,33 @@ export function View({ pokemon }: Props) {
     let sprite = "";
 
     // se forma for feminina
-    if (specie && genre > 1 && specie.has_gender_differences && specie.varieties.length < 2) {
+    if (
+      specie &&
+      genre > 1 &&
+      specie.has_gender_differences &&
+      !specie.forms_switchable &&
+      specie.varieties.length < 2
+    ) {
       const number = String(pokemon.id).padStart(3, "0");
       const endpoint = `${number}_f${genre}`;
       sprite = `https://assets.pokemon.com/assets/cms2/img/pokedex/full/${endpoint}.png`;
+    } else if (
+      specie &&
+      genre > 1 &&
+      specie.has_gender_differences &&
+      !specie.forms_switchable &&
+      specie.varieties.length > 1
+    ) {
+      const url = specie.varieties[genre - 1].pokemon.url;
+      const split = url.split("/");
+
+      const oldNumber = String(pokemon.id);
+      let newNumber = split[split.length - 1];
+
+      if (url.endsWith("/")) newNumber = split[split.length - 2];
+
+      const image = pokemon.sprites.other["official-artwork"].front_default;
+      sprite = image.replace(oldNumber, newNumber);
     } else {
       // caso não, retorna a forma padrão
       sprite = pokemon.sprites.other["official-artwork"].front_default;
@@ -109,14 +134,30 @@ export function View({ pokemon }: Props) {
     return sprite;
   };
 
+  const onGenreChanged = async (genre: 1 | 2) => {
+    if (specie && gender) {
+      const { varieties } = specie;
+      setLoading(true);
+
+      const url = varieties[genre - 1].pokemon.url;
+      const request = await fetch(url);
+      const response = await request.json();
+
+      setPokemon(response);
+      setLoading(false);
+    }
+
+    setGenre(genre);
+  };
+
   useEffect(() => {
-    if (pokemon) {
+    if (poke) {
       (async () => {
         setLoading(true);
 
-        const { id } = pokemon;
+        const { id } = poke;
         const request1 = await fetch(`https://pokeapi.co/api/v2/pokemon-species/${id}`);
-        const specie = await request1.json();
+        const specie = (await request1.json()) as Specie;
 
         if (specie.evolution_chain) {
           const request2 = await fetch(specie.evolution_chain.url);
@@ -126,11 +167,16 @@ export function View({ pokemon }: Props) {
           setEvolution(undefined);
         }
 
+        const { varieties } = specie;
+        const names = varieties.map((v) => v.pokemon.name);
+        setGender(names.some((name) => name.includes("female")));
+
+        setPokemon(poke);
         setSpecie(specie);
         setLoading(false);
       })();
     }
-  }, [pokemon]);
+  }, [poke]);
 
   return (
     <div className={`sticky top-24 rounded-lg p-4 xl:bg-gradient-to-br ${getGradientClassName(0)}`}>
@@ -172,7 +218,7 @@ export function View({ pokemon }: Props) {
                 </ul>
               </div>
 
-              {specie.has_gender_differences && (
+              {(specie.has_gender_differences || gender) && (
                 <div className="absolute top-0 right-0">
                   <div
                     className={classNames(
@@ -184,7 +230,7 @@ export function View({ pokemon }: Props) {
                   </div>
 
                   <ul className="flex flex-col gap-2 w-8 px-1 py-5 bg-white/20 rounded-3xl">
-                    <li onClick={() => setGenre(1)} className="cursor-pointer">
+                    <li onClick={() => onGenreChanged(1)} className="cursor-pointer">
                       <div
                         className={classNames("w-6 duration-400 transition-all", {
                           "-ml-1": genre === 1,
@@ -195,7 +241,7 @@ export function View({ pokemon }: Props) {
                         </div>
                       </div>
                     </li>
-                    <li onClick={() => setGenre(2)} className="cursor-pointer">
+                    <li onClick={() => onGenreChanged(2)} className="cursor-pointer">
                       <div
                         className={classNames("w-6 duration-400 transition-all", {
                           "-ml-1": genre === 2,

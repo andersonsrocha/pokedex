@@ -38,6 +38,7 @@ export interface Specie {
   evolution_chain: Chain;
   flavor_text_entries: Array<Description>;
   forms_switchable: boolean;
+  gender_rate: number;
   names: Array<Language>;
   genera: Array<Genera>;
   growth_rate: Record<"name" | "url", string>;
@@ -85,4 +86,5 @@ export interface Chain {
   id: number;
   evolves_to: Array<Chain>;
   species: Record<"name" | "url", string>;
+  url: string;
 }

@@ -132,7 +132,7 @@ export function Card(props: Props) {
               )}`}
             >
               <div className="text-white p-2 flex flex-col items-center">
-                {specie.forms_switchable && (
+                {specie.varieties.length > 1 && (
                   <div className="relative w-full">
                     <button
                       title="Transform"
