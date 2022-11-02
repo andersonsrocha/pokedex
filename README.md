@@ -17,6 +17,7 @@
 - [🔨 Build](#-build)
 - [🔍 Preview](#-preview)
 - [🔗 Links](#-links)
+- [📝 License](#-license)
 
 ## 📄 About
 
@@ -68,3 +69,7 @@ yarn run preview
 - [Vite](https://vitejs.dev/)
 - [Github](https://github.com/andersonsrocha)
 - [LinkedIn](https://www.linkedin.com/in/anderson-silva-a40926192)
+
+## 📝 License
+
+This project is under the MIT license. See the [LICENSE](LICENSE) file for more details.
