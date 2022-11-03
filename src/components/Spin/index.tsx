@@ -1,11 +1,11 @@
-import { Fragment, ReactNode } from "react";
+import { ReactNode } from "react";
 
 type Props = {
   spinning?: boolean;
   children: ReactNode;
 };
 
-export function Spin({ spinning, children }: Props) {
+function Spinner({ spinning, children }: Props) {
   return (
     <div className="h-full w-full">
       {spinning && (
@@ -40,3 +40,83 @@ export function Spin({ spinning, children }: Props) {
     </div>
   );
 }
+
+function Loading({ spinning, children }: Props) {
+  return (
+    <div>
+      {spinning && (
+        <div className="grid grid-cols-12 gap-6 min-h-[calc(100vh-208px)]">
+          <div className="col-span-12 xl:col-span-9">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              <div className="h-[390px] cursor-pointer bg-brand-500 rounded-lg flex items-center flex-col gap-2 p-4">
+                <div className="h-6 w-14 rounded-sm bg-brand-100 animate-pulse" />
+                <div className="h-[100px] w-[100px] rounded-full bg-brand-100 animate-pulse" />
+                <div className="h-6 w-40 rounded-sm bg-brand-100 animate-pulse" />
+                <div className="w-full flex-1 rounded-sm bg-brand-100 animate-pulse" />
+              </div>
+
+              <div className="h-[390px] cursor-pointer bg-brand-500 rounded-lg flex items-center flex-col gap-2 p-4">
+                <div className="h-6 w-14 rounded-sm bg-brand-100 animate-pulse" />
+                <div className="h-[100px] w-[100px] rounded-full bg-brand-100 animate-pulse" />
+                <div className="h-6 w-40 rounded-sm bg-brand-100 animate-pulse" />
+                <div className="w-full flex-1 rounded-sm bg-brand-100 animate-pulse" />
+              </div>
+
+              <div className="h-[390px] cursor-pointer bg-brand-500 rounded-lg flex items-center flex-col gap-2 p-4">
+                <div className="h-6 w-14 rounded-sm bg-brand-100 animate-pulse" />
+                <div className="h-[100px] w-[100px] rounded-full bg-brand-100 animate-pulse" />
+                <div className="h-6 w-40 rounded-sm bg-brand-100 animate-pulse" />
+                <div className="w-full flex-1 rounded-sm bg-brand-100 animate-pulse" />
+              </div>
+
+              <div className="h-[390px] cursor-pointer bg-brand-500 rounded-lg flex items-center flex-col gap-2 p-4">
+                <div className="h-6 w-14 rounded-sm bg-brand-100 animate-pulse" />
+                <div className="h-[100px] w-[100px] rounded-full bg-brand-100 animate-pulse" />
+                <div className="h-6 w-40 rounded-sm bg-brand-100 animate-pulse" />
+                <div className="w-full flex-1 rounded-sm bg-brand-100 animate-pulse" />
+              </div>
+
+              <div className="h-[390px] cursor-pointer bg-brand-500 rounded-lg flex items-center flex-col gap-2 p-4">
+                <div className="h-6 w-14 rounded-sm bg-brand-100 animate-pulse" />
+                <div className="h-[100px] w-[100px] rounded-full bg-brand-100 animate-pulse" />
+                <div className="h-6 w-40 rounded-sm bg-brand-100 animate-pulse" />
+                <div className="w-full flex-1 rounded-sm bg-brand-100 animate-pulse" />
+              </div>
+
+              <div className="h-[390px] cursor-pointer bg-brand-500 rounded-lg flex items-center flex-col gap-2 p-4">
+                <div className="h-6 w-14 rounded-sm bg-brand-100 animate-pulse" />
+                <div className="h-[100px] w-[100px] rounded-full bg-brand-100 animate-pulse" />
+                <div className="h-6 w-40 rounded-sm bg-brand-100 animate-pulse" />
+                <div className="w-full flex-1 rounded-sm bg-brand-100 animate-pulse" />
+              </div>
+            </div>
+          </div>
+
+          <div className="col-span-3 hidden xl:block">
+            <div className="h-[400px] cursor-pointer bg-brand-500 rounded-lg flex items-center flex-col gap-2 p-4 relative">
+              <div className="absolute left-4 w-10 h-28 bg-brand-100 rounded-t-full rounded-b-full" />
+
+              <div className="h-[100px] w-[100px] rounded-full bg-brand-100 animate-pulse" />
+
+              <div className="absolute right-4 w-10 h-28 bg-brand-100 rounded-t-full rounded-b-full" />
+
+              <div className="h-4 w-14 rounded-sm bg-brand-100 animate-pulse" />
+              <div className="h-6 w-32 rounded-sm bg-brand-100 animate-pulse" />
+              <div className="h-4 w-40 rounded-sm bg-brand-100 animate-pulse" />
+
+              <div className="h-8 w-32 rounded-sm bg-brand-100 animate-pulse mt-4" />
+              <div className="w-full flex-1 rounded-sm bg-brand-100 animate-pulse" />
+            </div>
+          </div>
+        </div>
+      )}
+
+      {!spinning && children}
+    </div>
+  );
+}
+
+export const Spin = {
+  Spinner,
+  Loading,
+};

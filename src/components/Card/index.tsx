@@ -120,7 +120,7 @@ export function Card(props: Props) {
 
   return (
     <div className="h-[390px]">
-      <Spin spinning={loading}>
+      <Spin.Spinner spinning={loading}>
         <div
           onClick={onClick}
           className="shadow-lg cursor-pointer hover:shadow-black md:hover:scale-105 transition duration-300 ease-in-out"
@@ -228,7 +228,7 @@ export function Card(props: Props) {
             </div>
           )}
         </div>
-      </Spin>
+      </Spin.Spinner>
     </div>
   );
 }

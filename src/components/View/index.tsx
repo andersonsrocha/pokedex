@@ -171,10 +171,11 @@ export function View({ pokemon: poke }: Props) {
           const names = varieties.map((v) => v.pokemon.name);
           const female = names.some((name) => name.includes("female"));
           const rate = (specie.gender_rate / 8) * 100;
+          const genre = 100 - rate !== 0 ? 1 : 2;
 
           setFemale(rate !== 0 || female);
           setMale(100 - rate !== 0);
-          setGenre(Math.ceil(rate / 100) + 1);
+          setGenre(genre);
         }
 
         setPokemon(poke);
@@ -187,7 +188,7 @@ export function View({ pokemon: poke }: Props) {
   return (
     <div className={`sticky top-24 rounded-lg p-4 xl:bg-gradient-to-br ${getGradientClassName(0)}`}>
       {pokemon && specie && (
-        <Spin spinning={loading}>
+        <Spin.Spinner spinning={loading}>
           <div className="flex flex-col gap-4">
             <div className="header relative z-30">
               <div className="absolute top-0 left-0">
@@ -347,7 +348,7 @@ export function View({ pokemon: poke }: Props) {
               </div>
             </div>
           </div>
-        </Spin>
+        </Spin.Spinner>
       )}
     </div>
   );

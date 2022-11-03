@@ -22,7 +22,9 @@
       "@assets": ["src/assets"],
       "@types": ["src/types/index"],
       "@icons": ["src/icons/index"],
-      "@constants": ["src/constants/index"]
+      "@constants": ["src/constants/index"],
+      "@pages": ["src/pages/index"],
+      "@layout": ["src/layout/index"]
     }
   },
   "include": ["src"],

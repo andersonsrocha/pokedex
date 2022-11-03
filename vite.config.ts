@@ -36,6 +36,14 @@ export default defineConfig({
         find: "@constants",
         replacement: path.resolve(__dirname, "./src/constants"),
       },
+      {
+        find: "@pages",
+        replacement: path.resolve(__dirname, "./src/pages"),
+      },
+      {
+        find: "@layout",
+        replacement: path.resolve(__dirname, "./src/layout"),
+      },
     ],
   },
 });
