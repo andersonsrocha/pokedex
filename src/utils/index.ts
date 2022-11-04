@@ -11,43 +11,43 @@ export function getType(pokemon: Pokemon, pos = 0) {
 export function getTypeIcon(type: Typing) {
   switch (type) {
     case "bug":
-      return Icons.BugOutline;
+      return Icons.BugIcon;
     case "dark":
-      return Icons.DarkOutline;
+      return Icons.DarkIcon;
     case "dragon":
-      return Icons.DragonOutline;
+      return Icons.DragonIcon;
     case "electric":
-      return Icons.ElectricOutline;
+      return Icons.ElectricIcon;
     case "fairy":
-      return Icons.FairyOutline;
+      return Icons.FairyIcon;
     case "fighting":
-      return Icons.FightingOutline;
+      return Icons.FightingIcon;
     case "fire":
-      return Icons.FireOutline;
+      return Icons.FireIcon;
     case "flying":
-      return Icons.FlyingOutline;
+      return Icons.FlyingIcon;
     case "ghost":
-      return Icons.GhostOutline;
+      return Icons.GhostIcon;
     case "grass":
-      return Icons.GrassOutline;
+      return Icons.GrassIcon;
     case "ground":
-      return Icons.GroundOutline;
+      return Icons.GroundIcon;
     case "ice":
-      return Icons.IceOutline;
+      return Icons.IceIcon;
     case "normal":
-      return Icons.NormalOutline;
+      return Icons.NormalIcon;
     case "poison":
-      return Icons.PoisonOutline;
+      return Icons.PoisonIcon;
     case "psychic":
-      return Icons.PsychicOutline;
+      return Icons.PsychicIcon;
     case "rock":
-      return Icons.RockOutline;
+      return Icons.RockIcon;
     case "steel":
-      return Icons.SteelOutline;
+      return Icons.SteelIcon;
     case "water":
-      return Icons.WaterOutline;
+      return Icons.WaterIcon;
     default:
-      return Icons.NormalOutline;
+      return Icons.NormalIcon;
   }
 }
 

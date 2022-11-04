@@ -1,5 +1,6 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
+  darkMode: "class",
   content: ["./src/**/*.tsx"],
   theme: {
     extend: {
@@ -7,11 +8,35 @@ module.exports = {
         strok: "strok 1.5s reverse",
       },
       colors: {
-        divide: "rgb(255 255 255 / 0.2)",
         disabled: "rgb(255 255 255 / 0.08)",
-        brand: {
-          100: "#313131",
-          500: "#232323",
+        divide: {
+          light: "#d9d9d9",
+          dark: "#303030",
+        },
+        component: {
+          light: "#ffffff",
+          dark: {
+            500: "#303030",
+            600: "#232323",
+          },
+        },
+        text: {
+          light: "#355764",
+          dark: "#ffffff",
+        },
+        hover: {
+          light: "#f5f5f5",
+          dark: "rgba(255, 255, 255, 0.08)",
+        },
+        primary: {
+          400: "#f2d357",
+          500: "#e6bc2f",
+          600: "#bf941d",
+        },
+        secondary: {
+          400: "#4d6870",
+          500: "#355764",
+          600: "#1d333d",
         },
         fire: {
           200: "#f8a060",

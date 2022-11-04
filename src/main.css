@@ -2,6 +2,16 @@
 @tailwind components;
 @tailwind utilities;
 
+@layer base {
+  body {
+    background: #f0f2f5;
+  }
+
+  .dark body {
+    background: #313131;
+  }
+}
+
 /* drawer content */
 .drawer-content {
   position: relative;

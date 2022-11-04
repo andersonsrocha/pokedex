@@ -1,22 +1,45 @@
-import { useContext, useEffect, useState } from "react";
 import {
   Card,
   Drawer,
   Empty,
+  Input,
   PageChangeEvent,
   Pagination,
   PaginationProps,
+  Select,
   Spin,
   View,
 } from "@components";
-
-import { Layout, LayoutContext } from "@layout";
+import {
+  BugIcon,
+  DarkIcon,
+  DragonIcon,
+  ElectricIcon,
+  FairyIcon,
+  FightingIcon,
+  FireIcon,
+  FlyingIcon,
+  GhostIcon,
+  GrassIcon,
+  GroundIcon,
+  IceIcon,
+  NormalIcon,
+  PoisonIcon,
+  PsychicIcon,
+  RockIcon,
+  SteelIcon,
+  WaterIcon,
+  WeightIcon,
+} from "@icons";
+import { HeightIcon, MagnifyingGlassIcon, OpacityIcon } from "@radix-ui/react-icons";
+import { createRef, FormEvent, Fragment, useEffect, useState } from "react";
 
 import { Pokemon } from "@types";
 
 export function List() {
-  const { search } = useContext(LayoutContext);
+  const input = createRef<HTMLInputElement>();
 
+  const [search, setSearch] = useState("");
   const [expand, setExpand] = useState(false);
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -50,6 +73,11 @@ export function List() {
 
   const onDrawerClose = () => {
     setOpen(false);
+  };
+
+  const onSearch = (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    if (input.current) setSearch(input.current.value);
   };
 
   useEffect(() => {
@@ -87,26 +115,166 @@ export function List() {
 
   return (
     <Spin.Loading spinning={loading}>
-      <div>
-        <div className="grid grid-cols-12 gap-6 min-h-[calc(100vh-208px)]">
-          <div className="col-span-12 xl:col-span-9">
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-              {pokemons.map((pokemon) => (
-                <Card key={pokemon.name} pokemon={pokemon} onClick={() => onCardClick(pokemon)} />
-              ))}
-            </div>
-          </div>
+      <div className="flex flex-col gap-8">
+        <div className="shadow-md rounded-md bg-component-light p-4 mb-4 dark:bg-component-dark-600">
+          <div className="relative w-full">
+            <form onSubmit={onSearch} autoComplete="off">
+              <div className="flex gap-4">
+                <Input
+                  ref={input}
+                  defaultValue={search}
+                  type="search"
+                  name="search"
+                  placeholder="Pesquisar"
+                  addonBefore={<MagnifyingGlassIcon />}
+                />
 
-          <div className="col-span-3 hidden xl:block">
-            <View pokemon={pokemon} />
+                <Select placeholder="Tipo" icon={<OpacityIcon />}>
+                  <Select.Option
+                    value="bug"
+                    icon={<BugIcon className="w-3 text-bug-500 drop-shadow-[0_0_4px]" />}
+                  >
+                    Bug
+                  </Select.Option>
+                  <Select.Option
+                    value="dark"
+                    icon={<DarkIcon className="w-3 text-dark-500 drop-shadow-[0_0_4px]" />}
+                  >
+                    Dark
+                  </Select.Option>
+                  <Select.Option
+                    value="dragon"
+                    icon={<DragonIcon className="w-3 text-dragon-500 drop-shadow-[0_0_4px]" />}
+                  >
+                    Dragon
+                  </Select.Option>
+                  <Select.Option
+                    value="electric"
+                    icon={<ElectricIcon className="w-3 text-electric-500 drop-shadow-[0_0_4px]" />}
+                  >
+                    Electric
+                  </Select.Option>
+                  <Select.Option
+                    value="fairy"
+                    icon={<FairyIcon className="w-3 text-fairy-500 drop-shadow-[0_0_4px]" />}
+                  >
+                    Fairy
+                  </Select.Option>
+                  <Select.Option
+                    value="fighting"
+                    icon={<FightingIcon className="w-3 text-fighting-500 drop-shadow-[0_0_4px]" />}
+                  >
+                    Fighting
+                  </Select.Option>
+                  <Select.Option
+                    value="fire"
+                    icon={<FireIcon className="w-3 text-fire-500 drop-shadow-[0_0_4px]" />}
+                  >
+                    Fire
+                  </Select.Option>
+                  <Select.Option
+                    value="flying"
+                    icon={<FlyingIcon className="w-3 text-flying-500 drop-shadow-[0_0_4px]" />}
+                  >
+                    Flying
+                  </Select.Option>
+                  <Select.Option
+                    value="ghost"
+                    icon={<GhostIcon className="w-3 text-ghost-500 drop-shadow-[0_0_4px]" />}
+                  >
+                    Ghost
+                  </Select.Option>
+                  <Select.Option
+                    value="grass"
+                    icon={<GrassIcon className="w-3 text-grass-500 drop-shadow-[0_0_4px]" />}
+                  >
+                    Grass
+                  </Select.Option>
+                  <Select.Option
+                    value="ground"
+                    icon={<GroundIcon className="w-3 text-ground-500 drop-shadow-[0_0_4px]" />}
+                  >
+                    Ground
+                  </Select.Option>
+                  <Select.Option
+                    value="ice"
+                    icon={<IceIcon className="w-3 text-ice-500 drop-shadow-[0_0_4px]" />}
+                  >
+                    Ice
+                  </Select.Option>
+                  <Select.Option
+                    value="normal"
+                    icon={<NormalIcon className="w-3 text-normal-500 drop-shadow-[0_0_4px]" />}
+                  >
+                    Normal
+                  </Select.Option>
+                  <Select.Option
+                    value="poison"
+                    icon={<PoisonIcon className="w-3 text-poison-500 drop-shadow-[0_0_4px]" />}
+                  >
+                    Poison
+                  </Select.Option>
+                  <Select.Option
+                    value="psychic"
+                    icon={<PsychicIcon className="w-3 text-psychic-500 drop-shadow-[0_0_4px]" />}
+                  >
+                    Psychic
+                  </Select.Option>
+                  <Select.Option
+                    value="rock"
+                    icon={<RockIcon className="w-3 text-rock-500 drop-shadow-[0_0_4px]" />}
+                  >
+                    Rock
+                  </Select.Option>
+                  <Select.Option
+                    value="steel"
+                    icon={<SteelIcon className="w-3 text-steel-500 drop-shadow-[0_0_4px]" />}
+                  >
+                    Steel
+                  </Select.Option>
+                  <Select.Option
+                    value="water"
+                    icon={<WaterIcon className="w-3 text-water-500 drop-shadow-[0_0_4px]" />}
+                  >
+                    Water
+                  </Select.Option>
+                </Select>
+
+                <Select placeholder="Altura" icon={<HeightIcon />}></Select>
+
+                <Select placeholder="Peso" icon={<WeightIcon />}></Select>
+              </div>
+            </form>
           </div>
         </div>
+
+        {!!pokemons.length && (
+          <Fragment>
+            <div className="grid grid-cols-12 gap-6">
+              <div className="col-span-12 xl:col-span-9">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {pokemons.map((pokemon) => (
+                    <Card
+                      key={pokemon.name}
+                      pokemon={pokemon}
+                      onClick={() => onCardClick(pokemon)}
+                    />
+                  ))}
+                </div>
+              </div>
+
+              <div className="col-span-3 hidden xl:block">
+                <View pokemon={pokemon} />
+              </div>
+            </div>
+
+            <div className="flex justify-center">
+              <Pagination {...pagination} onChange={onPageChanged} />
+            </div>
+          </Fragment>
+        )}
 
         {!pokemons.length && <Empty />}
-
-        <div className="mt-8 flex justify-center">
-          <Pagination {...pagination} onChange={onPageChanged} />
-        </div>
       </div>
 
       <Drawer expanded={expand} open={open} onChange={setExpand} onClose={onDrawerClose}>

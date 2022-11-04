@@ -94,12 +94,12 @@ export function Pagination(props: PaginationProps) {
   };
 
   return (
-    <ul className="flex gap-1 text-white text-sm">
+    <ul className="flex gap-1 text-sm text-[#000000d9] dark:text-text-dark">
       <li>
         <button
           onClick={onPrev}
           disabled={current < 2}
-          className="w-8 h-8 rounded-sm border-[1px] border-divide disabled:cursor-not-allowed disabled:bg-disabled"
+          className="w-9 h-9 rounded-sm shadow-md bg-component-light border border-divide-light disabled:cursor-not-allowed disabled:bg-disabled disabled:text-divide-light disabled:border-divide-light hover:border-primary-500 hover:text-primary-500 dark:bg-component-dark-600 dark:border-divide-dark dark:disabled:text-divide-dark dark:hover:border-primary-500 dark:hover:disabled:border-divide-dark"
         >
           <span aria-hidden="true">&lt;</span>
         </button>
@@ -108,7 +108,7 @@ export function Pagination(props: PaginationProps) {
       {getPagination().map((page) => (
         <li key={page}>
           {page == "LEFT" && (
-            <button onClick={onMoveLeft} className="w-8 h-8 rounded-sm">
+            <button onClick={onMoveLeft} className="w-9 h-9 rounded-sm">
               <span aria-hidden="true">&laquo;</span>
             </button>
           )}
@@ -116,15 +116,19 @@ export function Pagination(props: PaginationProps) {
           <button
             hidden={typeof page != "number"}
             onClick={() => onChangePage(Number(page))}
-            className={classNames("w-8 h-8 rounded-sm border-[1px] border-divide", {
-              "bg-white text-brand-500": page == current,
-            })}
+            className={classNames(
+              "w-9 h-9 rounded-sm shadow-md bg-component-light border border-divide-light hover:border-primary-500 hover:text-primary-500 dark:bg-component-dark-600 dark:border-divide-dark dark:hover:border-primary-500",
+              {
+                "bg-component-light border-primary-500 text-primary-500 dark:border-primary-500":
+                  page == current,
+              }
+            )}
           >
             {page}
           </button>
 
           {page == "RIGHT" && (
-            <button onClick={onMoveRight} className="w-8 h-8 rounded-sm">
+            <button onClick={onMoveRight} className="w-9 h-9 rounded-sm">
               <span aria-hidden="true">&raquo;</span>
             </button>
           )}
@@ -135,7 +139,7 @@ export function Pagination(props: PaginationProps) {
         <button
           onClick={onNext}
           disabled={current == pagesCount}
-          className="w-8 h-8 rounded-sm border-[1px] border-divide disabled:cursor-not-allowed disabled:bg-disabled"
+          className="w-9 h-9 rounded-sm shadow-md bg-component-light border border-divide-light disabled:cursor-not-allowed disabled:bg-disabled disabled:text-divide-light disabled:border-divide-light hover:border-primary-500 hover:text-primary-500 dark:bg-component-dark-600 dark:border-divide-dark dark:disabled:text-divide-dark dark:hover:border-primary-500 dark:hover:disabled:border-divide-dark"
         >
           <span aria-hidden="true">&gt;</span>
         </button>

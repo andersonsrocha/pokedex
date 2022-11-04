@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { FemaleOutline, MaleOutline, WaveOutline } from "@icons";
+import { FemaleIcon, MaleIcon, WaveIcon } from "@icons";
 import { getType, getTypeIcon } from "@utils";
 import classNames from "classnames";
 
@@ -24,24 +24,24 @@ export function View({ pokemon: poke }: Props) {
   const getGradientClassName = (position: number) => {
     if (pokemon) {
       return classNames({
-        "xl:to-brand-100 xl:from-bug-500": getType(pokemon, position) === "bug",
-        "xl:to-brand-100 xl:from-dark-500": getType(pokemon, position) === "dark",
-        "xl:to-brand-100 xl:from-dragon-500": getType(pokemon, position) === "dragon",
-        "xl:to-brand-100 xl:from-electric-500": getType(pokemon, position) === "electric",
-        "xl:to-brand-100 xl:from-fairy-500": getType(pokemon, position) === "fairy",
-        "xl:to-brand-100 xl:from-fighting-500": getType(pokemon, position) === "fighting",
-        "xl:to-brand-100 xl:from-fire-500": getType(pokemon, position) === "fire",
-        "xl:to-brand-100 xl:from-flying-500": getType(pokemon, position) === "flying",
-        "xl:to-brand-100 xl:from-ghost-500": getType(pokemon, position) === "ghost",
-        "xl:to-brand-100 xl:from-grass-500": getType(pokemon, position) === "grass",
-        "xl:to-brand-100 xl:from-ground-500": getType(pokemon, position) === "ground",
-        "xl:to-brand-100 xl:from-ice-500": getType(pokemon, position) === "ice",
-        "xl:to-brand-100 xl:from-normal-500": getType(pokemon, position) === "normal",
-        "xl:to-brand-100 xl:from-poison-500": getType(pokemon, position) === "poison",
-        "xl:to-brand-100 xl:from-psychic-500": getType(pokemon, position) === "psychic",
-        "xl:to-brand-100 xl:from-rock-500": getType(pokemon, position) === "rock",
-        "xl:to-brand-100 xl:from-steel-500": getType(pokemon, position) === "steel",
-        "xl:to-brand-100 xl:from-water-500": getType(pokemon, position) === "water",
+        "xl:to-secondary-500 xl:from-bug-500": getType(pokemon, position) === "bug",
+        "xl:to-secondary-500 xl:from-dark-500": getType(pokemon, position) === "dark",
+        "xl:to-secondary-500 xl:from-dragon-500": getType(pokemon, position) === "dragon",
+        "xl:to-secondary-500 xl:from-electric-500": getType(pokemon, position) === "electric",
+        "xl:to-secondary-500 xl:from-fairy-500": getType(pokemon, position) === "fairy",
+        "xl:to-secondary-500 xl:from-fighting-500": getType(pokemon, position) === "fighting",
+        "xl:to-secondary-500 xl:from-fire-500": getType(pokemon, position) === "fire",
+        "xl:to-secondary-500 xl:from-flying-500": getType(pokemon, position) === "flying",
+        "xl:to-secondary-500 xl:from-ghost-500": getType(pokemon, position) === "ghost",
+        "xl:to-secondary-500 xl:from-grass-500": getType(pokemon, position) === "grass",
+        "xl:to-secondary-500 xl:from-ground-500": getType(pokemon, position) === "ground",
+        "xl:to-secondary-500 xl:from-ice-500": getType(pokemon, position) === "ice",
+        "xl:to-secondary-500 xl:from-normal-500": getType(pokemon, position) === "normal",
+        "xl:to-secondary-500 xl:from-poison-500": getType(pokemon, position) === "poison",
+        "xl:to-secondary-500 xl:from-psychic-500": getType(pokemon, position) === "psychic",
+        "xl:to-secondary-500 xl:from-rock-500": getType(pokemon, position) === "rock",
+        "xl:to-secondary-500 xl:from-steel-500": getType(pokemon, position) === "steel",
+        "xl:to-secondary-500 xl:from-water-500": getType(pokemon, position) === "water",
       });
     }
 
@@ -52,7 +52,7 @@ export function View({ pokemon: poke }: Props) {
     if (pokemon) {
       return classNames({
         "text-bug-500 border-bug-500": getType(pokemon, position) === "bug",
-        "text-dark-500 border-dark-500": getType(pokemon, position) === "dark",
+        "text-divide-light/60 border-dark-500": getType(pokemon, position) === "dark",
         "text-dragon-500 border-dragon-500": getType(pokemon, position) === "dragon",
         "text-electric-500 border-electric-500": getType(pokemon, position) === "electric",
         "text-fairy-500 border-fairy-500": getType(pokemon, position) === "fairy",
@@ -198,7 +198,7 @@ export function View({ pokemon: poke }: Props) {
                     { "-top-12": tab === 0, "-top-4": tab === 1, "top-4": tab === 2 }
                   )}
                 >
-                  <WaveOutline />
+                  <WaveIcon />
                 </div>
 
                 <ul className="flex flex-col gap-2 w-8 px-1 py-5 bg-white/20 rounded-3xl min-h-[120px]">
@@ -233,7 +233,7 @@ export function View({ pokemon: poke }: Props) {
                       { "-top-1": genre === 1, "top-8": genre === 2 }
                     )}
                   >
-                    <WaveOutline />
+                    <WaveIcon />
                   </div>
 
                   <ul className="flex flex-col gap-2 w-8 px-1 py-5 bg-white/20 rounded-3xl">
@@ -251,7 +251,7 @@ export function View({ pokemon: poke }: Props) {
                             { "cursor-not-allowed opacity-50": !male, "opacity-100": male }
                           )}
                         >
-                          <MaleOutline />
+                          <MaleIcon />
                         </button>
                       </div>
                     </li>
@@ -270,7 +270,7 @@ export function View({ pokemon: poke }: Props) {
                             { "cursor-not-allowed opacity-50": !female, "opacity-100": female }
                           )}
                         >
-                          <FemaleOutline />
+                          <FemaleIcon />
                         </button>
                       </div>
                     </li>
@@ -279,12 +279,14 @@ export function View({ pokemon: poke }: Props) {
               )}
             </div>
 
-            <div className="main relative text-white text-center z-20">
+            <div className="main relative text-text-dark text-center z-20">
               <div className="flex justify-center items-end h-[80px] relative">
                 <Img alt="poke" width={150} src={getSprite(pokemon, genre)} />
               </div>
 
-              <div className="text-white/70">{`#${pokemon.id.toString().padStart(3, "0")}`}</div>
+              <div className="text-text-dark/70">{`#${pokemon.id
+                .toString()
+                .padStart(3, "0")}`}</div>
 
               <div className="flex flex-col gap-2">
                 <div className="capitalize text-xl">{pokemon.name}</div>
@@ -317,7 +319,7 @@ export function View({ pokemon: poke }: Props) {
                       {pokemon.abilities.map((x, i) => (
                         <div
                           key={i}
-                          className="w-[45%] border border-gray-500 p-2 rounded-3xl bg-white/10"
+                          className="w-[45%] border border-divide-light p-2 rounded-3xl bg-white/10"
                         >
                           {x.ability.name}
                         </div>
@@ -330,14 +332,14 @@ export function View({ pokemon: poke }: Props) {
                   <div className="grid grid-cols-2 gap-2">
                     <div className="flex flex-col gap-2">
                       <div className="text-white">HEIGHT</div>
-                      <div className="text-white/70 text-sm capitalize border border-gray-500 flex-1 p-2 rounded-3xl bg-white/10">
+                      <div className="text-white/70 text-sm capitalize border border-divide-light flex-1 p-2 rounded-3xl bg-white/10">
                         {pokemon.height / 10}m
                       </div>
                     </div>
 
                     <div className="flex flex-col gap-2">
                       <div className="text-white">WEIGHT</div>
-                      <div className="text-white/70 text-sm capitalize border border-gray-500 flex-1 p-2 rounded-3xl bg-white/10">
+                      <div className="text-white/70 text-sm capitalize border border-divide-light flex-1 p-2 rounded-3xl bg-white/10">
                         {pokemon.weight / 10}kg
                       </div>
                     </div>

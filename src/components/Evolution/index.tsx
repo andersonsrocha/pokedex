@@ -1,5 +1,5 @@
 import { Fragment, useEffect, useState } from "react";
-import { ArrowRightOutline, ArrowDownOutline } from "@icons";
+import { ArrowRightIcon } from "@radix-ui/react-icons";
 
 import { Spin, Img } from "..";
 
@@ -48,7 +48,7 @@ export function Evolution({ chain, onClick }: Props) {
   }, []);
 
   return (
-    <Spin spinning={loading}>
+    <Spin.Spinner spinning={loading}>
       <div className="flex justify-between items-center">
         {evolution.map((pokes, index) => (
           <Fragment key={index}>
@@ -64,10 +64,10 @@ export function Evolution({ chain, onClick }: Props) {
               ))}
             </div>
 
-            {index != evolution.length - 1 && <ArrowRightOutline />}
+            {index != evolution.length - 1 && <ArrowRightIcon />}
           </Fragment>
         ))}
       </div>
-    </Spin>
+    </Spin.Spinner>
   );
 }

@@ -24,7 +24,7 @@ export function Draggable({ children, open, expanded }: Props) {
     <div
       style={styles}
       onClick={(e) => e.stopPropagation()}
-      className={classNames("drawer-content bg-brand-500 rounded-t-3xl", {
+      className={classNames("drawer-content bg-secondary rounded-t-3xl", {
         dragging: isDragging,
         expanded: expanded,
         "pointer-events-none": !open,
@@ -36,11 +36,11 @@ export function Draggable({ children, open, expanded }: Props) {
         {...listeners}
         {...attributes}
         className={classNames(
-          "relative flex flex-shrink-0 box-border items-center justify-center bg-brand-500 border-b border-divide rounded-t-3xl h-10 text-xl text-white p-4 touch-none cursor-grab before:absolute before:w-[50px] before:h-[3px] before:bg-white/20 before:transition-colors before:duration-[0.2s]",
+          "relative flex flex-shrink-0 box-border items-center justify-center bg-secondary border-b border-divide rounded-t-3xl h-10 text-xl text-white p-4 touch-none cursor-grab before:absolute before:w-[50px] before:h-[3px] before:bg-white/20 before:transition-colors before:duration-[0.2s]",
           { "cursor-grabbing before:bg-white/30": isDragging }
         )}
       />
-      <div className="pt-10 pb-4 px-4 overflow-y-auto block bg-brand-500">{children}</div>
+      <div className="pt-10 pb-4 px-4 overflow-y-auto block bg-secondary">{children}</div>
     </div>
   );
 }

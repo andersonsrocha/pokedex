@@ -1,14 +1,14 @@
-import { GithubOutline, LinkedinOutline } from "@icons";
+import { GithubIcon, LinkedinIcon } from "@icons";
 
 export function Footer() {
   return (
-    <div className="h-16 bg-brand-100 px-4 md:px-20">
-      <div className="h-full flex items-center justify-between border-t-[1px] border-divide">
+    <div className="w-full h-16 bg-primary-500 dark:bg-component-dark-600">
+      <div className="h-full flex items-center justify-between px-4 md:px-20">
         <div />
 
         <div className="flex gap-4">
           <a href="https://github.com/andersonsrocha" target="_blank" className="w-8">
-            <GithubOutline />
+            <GithubIcon />
           </a>
 
           <a
@@ -16,7 +16,7 @@ export function Footer() {
             target="_blank"
             className="w-8"
           >
-            <LinkedinOutline />
+            <LinkedinIcon />
           </a>
         </div>
       </div>

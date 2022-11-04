@@ -1,10 +1,11 @@
 import React, { useEffect, useState, MouseEvent } from "react";
 import { getType, getTypeIcon } from "@utils";
 import { Img, Spin, Stats } from "@components";
-import { WeightOutline, HeightOutline } from "@icons";
 import classNames from "classnames";
 
 import { Pokemon, Specie } from "@types";
+import { HeightIcon } from "@radix-ui/react-icons";
+import { WeightIcon } from "@icons";
 
 type Props = {
   pokemon: Pokemon;
@@ -24,24 +25,24 @@ export function Card(props: Props) {
 
   const getGradientClassName = (position: number) => {
     return classNames({
-      "to-brand-100 from-bug-500": getType(pokemon, position) === "bug",
-      "to-brand-100 from-dark-500": getType(pokemon, position) === "dark",
-      "to-brand-100 from-dragon-500": getType(pokemon, position) === "dragon",
-      "to-brand-100 from-electric-500": getType(pokemon, position) === "electric",
-      "to-brand-100 from-fairy-500": getType(pokemon, position) === "fairy",
-      "to-brand-100 from-fighting-500": getType(pokemon, position) === "fighting",
-      "to-brand-100 from-fire-500": getType(pokemon, position) === "fire",
-      "to-brand-100 from-flying-500": getType(pokemon, position) === "flying",
-      "to-brand-100 from-ghost-500": getType(pokemon, position) === "ghost",
-      "to-brand-100 from-grass-500": getType(pokemon, position) === "grass",
-      "to-brand-100 from-ground-500": getType(pokemon, position) === "ground",
-      "to-brand-100 from-ice-500": getType(pokemon, position) === "ice",
-      "to-brand-100 from-normal-500": getType(pokemon, position) === "normal",
-      "to-brand-100 from-poison-500": getType(pokemon, position) === "poison",
-      "to-brand-100 from-psychic-500": getType(pokemon, position) === "psychic",
-      "to-brand-100 from-rock-500": getType(pokemon, position) === "rock",
-      "to-brand-100 from-steel-500": getType(pokemon, position) === "steel",
-      "to-brand-100 from-water-500": getType(pokemon, position) === "water",
+      "to-secondary-500 from-bug-500": getType(pokemon, position) === "bug",
+      "to-secondary-500 from-dark-500": getType(pokemon, position) === "dark",
+      "to-secondary-500 from-dragon-500": getType(pokemon, position) === "dragon",
+      "to-secondary-500 from-electric-500": getType(pokemon, position) === "electric",
+      "to-secondary-500 from-fairy-500": getType(pokemon, position) === "fairy",
+      "to-secondary-500 from-fighting-500": getType(pokemon, position) === "fighting",
+      "to-secondary-500 from-fire-500": getType(pokemon, position) === "fire",
+      "to-secondary-500 from-flying-500": getType(pokemon, position) === "flying",
+      "to-secondary-500 from-ghost-500": getType(pokemon, position) === "ghost",
+      "to-secondary-500 from-grass-500": getType(pokemon, position) === "grass",
+      "to-secondary-500 from-ground-500": getType(pokemon, position) === "ground",
+      "to-secondary-500 from-ice-500": getType(pokemon, position) === "ice",
+      "to-secondary-500 from-normal-500": getType(pokemon, position) === "normal",
+      "to-secondary-500 from-poison-500": getType(pokemon, position) === "poison",
+      "to-secondary-500 from-psychic-500": getType(pokemon, position) === "psychic",
+      "to-secondary-500 from-rock-500": getType(pokemon, position) === "rock",
+      "to-secondary-500 from-steel-500": getType(pokemon, position) === "steel",
+      "to-secondary-500 from-water-500": getType(pokemon, position) === "water",
     });
   };
 
@@ -123,20 +124,20 @@ export function Card(props: Props) {
       <Spin.Spinner spinning={loading}>
         <div
           onClick={onClick}
-          className="shadow-lg cursor-pointer hover:shadow-black md:hover:scale-105 transition duration-300 ease-in-out"
+          className="hover:shadow-lg cursor-pointer md:hover:scale-105 transition duration-300 ease-in-out dark:hover:shadow-white/10"
         >
           {specie && (
             <div
-              className={`bg-gradient-to-br flex flex-col h-full rounded-lg ${getGradientClassName(
+              className={`flex flex-col h-full rounded-lg bg-gradient-to-br ${getGradientClassName(
                 0
               )}`}
             >
-              <div className="text-white p-2 flex flex-col items-center">
+              <div className="p-2 flex flex-col items-center text-text-dark">
                 {specie.varieties.length > 1 && (
                   <div className="relative w-full">
                     <button
                       title="Transform"
-                      className="flex justify-center items-center bg-brand-100 absolute right-0 w-6 h-6 rounded-full text-sm hover:bg-brand-500"
+                      className="flex justify-center items-center bg-transparent border border-divide-light absolute right-0 w-6 h-6 rounded-full text-sm hover:bg-gray-100"
                       onClick={(e) => onVarietyChanged(e, variety)}
                     >
                       ✨
@@ -144,16 +145,16 @@ export function Card(props: Props) {
                   </div>
                 )}
 
-                <div className="font-extrabold text-white/70">{`#${pokeNumber}`}</div>
+                <div className="font-extrabold">{`#${pokeNumber}`}</div>
 
                 <div className="h-[100px]">
                   <Img alt="poke" width={100} src={getSprite(pokemon)} />
                 </div>
 
-                <div className="capitalize text-white/70">{pokemon.name}</div>
+                <div className="capitalize">{pokemon.name}</div>
               </div>
 
-              <div className="bg-white text-sm shadow-2xl flex flex-col gap-4 flex-1 rounded-t-2xl rounded-b-lg p-4">
+              <div className="bg-component-light text-sm shadow-2xl flex flex-col gap-4 flex-1 rounded-t-2xl rounded-b-lg p-4 dark:text-text-light">
                 <div className={`grid grid-cols-${typeLen}`}>
                   {pokemon.types.map(({ type }, index) => (
                     <div key={index} className="flex justify-center">
@@ -171,11 +172,11 @@ export function Card(props: Props) {
 
                 <div className="grid grid-cols-2 divide-x">
                   <div className="flex justify-center items-center gap-1">
-                    <WeightOutline />
+                    <WeightIcon />
                     {getWeight(pokemon.weight)}
                   </div>
                   <div className="flex justify-center items-center gap-1">
-                    <HeightOutline />
+                    <HeightIcon />
                     {getHeight(pokemon.height)}
                   </div>
                 </div>
