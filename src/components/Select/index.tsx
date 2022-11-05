@@ -1,12 +1,13 @@
+import React, { forwardRef, ReactNode } from "react";
 import * as SelectPrimitive from "@radix-ui/react-select";
 import { CheckIcon, ChevronDownIcon, ChevronUpIcon } from "@radix-ui/react-icons";
-import { NormalIcon } from "@icons";
-import React, { forwardRef, Fragment, ReactNode } from "react";
 
-type SelectProps = {
+type SelectProps<T> = {
   placeholder?: string;
   icon?: ReactNode;
   children?: ReactNode;
+  value?: string;
+  onChange?: (value: T) => void;
 };
 
 type ItemProps = {
@@ -15,11 +16,16 @@ type ItemProps = {
   icon?: ReactNode;
 };
 
-function InternalSelect(props: SelectProps, ref: React.Ref<HTMLButtonElement>) {
-  const { icon, placeholder = "Selecione", children } = props;
+function InternalSelect<T = string>(props: SelectProps<T>, ref: React.Ref<HTMLButtonElement>) {
+  const { icon, placeholder = "Selecione", children, value, onChange } = props;
+
+  const onValueChanged = (val: string) => {
+    const value = val as T;
+    onChange?.(value);
+  };
 
   return (
-    <SelectPrimitive.Root>
+    <SelectPrimitive.Root value={value} onValueChange={onValueChanged}>
       <SelectPrimitive.SelectTrigger
         ref={ref}
         className="inline-flex justify-between items-center bg-component-light border border-divide-light px-2 rounded-sm gap-2 cursor-pointer dark:border-divide-dark dark:bg-component-dark-600"
@@ -65,8 +71,8 @@ function Option(props: ItemProps) {
   );
 }
 
-const Select = forwardRef(InternalSelect) as unknown as ((
-  props: React.PropsWithChildren<SelectProps>
+const Select = forwardRef(InternalSelect) as unknown as (<T = string>(
+  props: React.PropsWithChildren<SelectProps<T>>
 ) => React.ReactElement) & {
   Option: typeof Option;
 };

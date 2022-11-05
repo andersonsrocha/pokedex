@@ -23,11 +23,17 @@ export interface Pokemon {
   base_experience: number;
   height: number;
   id: number;
+  is_default: number;
   name: string;
   sprites: Sprite;
   stats: Array<Stats>;
   types: Array<Type>;
   weight: number;
+}
+
+export interface NamedPokemon {
+  name: string;
+  url: string;
 }
 
 export interface Specie {

@@ -124,4 +124,5 @@ module.exports = {
       brand: ["Bahnschrift", "'Roboto Condensed'", "sans-serif"],
     },
   },
+  plugins: [require("tailwindcss-animate")],
 };

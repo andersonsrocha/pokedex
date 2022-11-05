@@ -8,10 +8,14 @@ import { Spin, Img, Evolution } from "..";
 import { Chain, Pokemon, Specie } from "@types";
 
 type Props = {
+  loading?: boolean;
   pokemon?: Pokemon;
+  onConcluded: (loading: boolean) => void;
 };
 
-export function View({ pokemon: poke }: Props) {
+export function View(props: Props) {
+  const { pokemon: poke, onConcluded } = props;
+
   const [tab, setTab] = useState(0);
   const [genre, setGenre] = useState(1);
   const [pokemon, setPokemon] = useState<Pokemon>();
@@ -181,14 +185,17 @@ export function View({ pokemon: poke }: Props) {
         setPokemon(poke);
         setSpecie(specie);
         setLoading(false);
+        onConcluded(true);
       })();
     }
   }, [poke]);
 
   return (
-    <div className={`sticky top-24 rounded-lg p-4 xl:bg-gradient-to-br ${getGradientClassName(0)}`}>
-      {pokemon && specie && (
-        <Spin.Spinner spinning={loading}>
+    <Spin.Skeleton spinning={props.loading || loading}>
+      <div
+        className={`sticky top-24 rounded-lg p-4 xl:bg-gradient-to-br ${getGradientClassName(0)}`}
+      >
+        {pokemon && specie && (
           <div className="flex flex-col gap-4">
             <div className="header relative z-30">
               <div className="absolute top-0 left-0">
@@ -350,8 +357,8 @@ export function View({ pokemon: poke }: Props) {
               </div>
             </div>
           </div>
-        </Spin.Spinner>
-      )}
-    </div>
+        )}
+      </div>
+    </Spin.Skeleton>
   );
 }

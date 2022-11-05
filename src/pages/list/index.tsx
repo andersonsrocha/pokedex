@@ -1,3 +1,4 @@
+import { createRef, FormEvent, Fragment, useEffect, useState } from "react";
 import {
   Card,
   Drawer,
@@ -29,34 +30,50 @@ import {
   RockIcon,
   SteelIcon,
   WaterIcon,
-  WeightIcon,
 } from "@icons";
-import { HeightIcon, MagnifyingGlassIcon, OpacityIcon } from "@radix-ui/react-icons";
-import { createRef, FormEvent, Fragment, useEffect, useState } from "react";
+import { MagnifyingGlassIcon, OpacityIcon } from "@radix-ui/react-icons";
 
-import { Pokemon } from "@types";
+import { NamedPokemon, Pokemon, Typing } from "@types";
+
+type Filters = {
+  search: string;
+  type?: Typing;
+};
 
 export function List() {
   const input = createRef<HTMLInputElement>();
 
-  const [search, setSearch] = useState("");
+  const [lastIndex, setLastIndex] = useState(0);
+  const [filter, setFilter] = useState<Filters>({ search: "" });
   const [expand, setExpand] = useState(false);
   const [open, setOpen] = useState(false);
-  const [loading, setLoading] = useState(false);
+  const [initialize, setInitialize] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [pokemon, setPokemon] = useState<Pokemon>();
   const [pokemons, setPokemons] = useState<Array<Pokemon>>([]);
   const [pagination, setPagination] = useState<PaginationProps>({ count: 0, pageNumber: 1 });
 
-  const find = (list: Array<Pokemon>, pageNumber: number, pageSize: number) => {
+  const find = (list: Array<NamedPokemon>, pageNumber: number, pageSize: number) => {
+    const { search } = filter;
     const value = search.toLowerCase();
-    const pokemons = list.filter((x) => x.name.toLowerCase().includes(value));
+
+    list = list.filter((x) => {
+      const url = x.url.split("pokemon/")[1];
+      const id = url.replace(/\D/g, "");
+      return Number(id) <= lastIndex;
+    });
+
+    let pokemons: Array<NamedPokemon> = list;
+
+    if (search) pokemons = pokemons.filter((x) => x.name.toLowerCase().includes(value));
+
     const sliced = pokemons.slice(
       (pageNumber - 1) * pageSize,
       (pageNumber - 1) * pageSize + pageSize
     );
 
     return {
-      count: pokemons.length,
+      count: list.length,
       results: sliced,
     };
   };
@@ -71,65 +88,98 @@ export function List() {
     setPagination((pag) => ({ ...pag, pageNumber, pageSize }));
   };
 
+  const onFilterChanged = (key: keyof Filters, value: unknown, e?: FormEvent<HTMLFormElement>) => {
+    e?.preventDefault();
+    setPagination((pag) => ({ ...pag, pageNumber: 1 }));
+    setFilter((filter) => ({ ...filter, [key]: value }));
+  };
+
   const onDrawerClose = () => {
     setOpen(false);
   };
 
-  const onSearch = (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    if (input.current) setSearch(input.current.value);
+  const onConcluded = (concluded: boolean) => {
+    setLoading(!concluded);
   };
 
-  useEffect(() => {
-    setPagination((pag) => ({ ...pag, pageNumber: 1 }));
-  }, [search]);
+  const compoundURL = () => {
+    const { search, type } = filter;
+    const { pageNumber, pageSize = 21 } = pagination;
+
+    if (type) {
+      return `https://pokeapi.co/api/v2/type/${type}`;
+    } else if (type || search) {
+      return "https://pokeapi.co/api/v2/pokemon-species?limit=10000";
+    }
+
+    return `https://pokeapi.co/api/v2/pokemon-species?limit=${pageSize}&offset=${
+      (pageNumber - 1) * pageSize
+    }`;
+  };
 
   useEffect(() => {
     (async () => {
       setLoading(true);
 
       const { pageNumber, pageSize = 21 } = pagination;
+      const { type } = filter;
 
-      const url = search
-        ? `https://pokeapi.co/api/v2/pokemon-species?limit=10000`
-        : `https://pokeapi.co/api/v2/pokemon-species?limit=${pageSize}&offset=${
-            (pageNumber - 1) * pageSize
-          }`;
+      const url = compoundURL();
       const request = await fetch(url);
-      const response = await request.json();
-      const filtered = search ? find(response.results, pageNumber, pageSize) : response;
+      let response = await request.json();
 
-      const list: Array<Pokemon> = [];
-      for (const item of filtered.results) {
+      if (type) {
+        const results = response.pokemon.map((pokemon: any) => pokemon.pokemon);
+        response = find(results, pageNumber, pageSize);
+      } else {
+        response = find(response.results, pageNumber, pageSize);
+      }
+
+      let list: Array<Pokemon> = [];
+      for (const item of response.results) {
         const request = await fetch(item.url.replace("-species", ""));
         const pokemon = (await request.json()) as Pokemon;
         list.push(pokemon);
       }
 
+      if (!initialize) {
+        const request = await fetch("https://pokeapi.co/api/v2/pokemon-species");
+        const { count } = await request.json();
+        setLastIndex(count);
+      }
+
       setPokemon(list[0]);
       setPokemons(list);
-      setPagination((pag) => ({ ...pag, count: filtered.count }));
-      setLoading(false);
+      setPagination((pag) => ({ ...pag, count: response.count }));
+      setInitialize(true);
     })();
-  }, [pagination.pageNumber, search]);
+  }, [pagination.pageNumber, filter]);
 
   return (
-    <Spin.Loading spinning={loading}>
+    <Fragment>
       <div className="flex flex-col gap-8">
         <div className="shadow-md rounded-md bg-component-light p-4 mb-4 dark:bg-component-dark-600">
           <div className="relative w-full">
-            <form onSubmit={onSearch} autoComplete="off">
+            <form
+              autoComplete="off"
+              onSubmit={(e) => onFilterChanged("search", input.current?.value, e)}
+            >
               <div className="flex gap-4">
                 <Input
                   ref={input}
-                  defaultValue={search}
+                  defaultValue={filter.search}
                   type="search"
                   name="search"
                   placeholder="Pesquisar"
                   addonBefore={<MagnifyingGlassIcon />}
                 />
 
-                <Select placeholder="Tipo" icon={<OpacityIcon />}>
+                <Select
+                  placeholder="Tipo"
+                  value={filter.type}
+                  icon={<OpacityIcon />}
+                  onChange={(value) => onFilterChanged("type", value)}
+                >
                   <Select.Option
                     value="bug"
                     icon={<BugIcon className="w-3 text-bug-500 drop-shadow-[0_0_4px]" />}
@@ -239,16 +289,14 @@ export function List() {
                     Water
                   </Select.Option>
                 </Select>
-
-                <Select placeholder="Altura" icon={<HeightIcon />}></Select>
-
-                <Select placeholder="Peso" icon={<WeightIcon />}></Select>
               </div>
             </form>
           </div>
         </div>
 
-        {!!pokemons.length && (
+        {!initialize && <Spin.Loading spinning={loading} />}
+
+        {initialize && !!pokemons.length && (
           <Fragment>
             <div className="grid grid-cols-12 gap-6">
               <div className="col-span-12 xl:col-span-9">
@@ -256,7 +304,9 @@ export function List() {
                   {pokemons.map((pokemon) => (
                     <Card
                       key={pokemon.name}
+                      loading={loading}
                       pokemon={pokemon}
+                      onConcluded={onConcluded}
                       onClick={() => onCardClick(pokemon)}
                     />
                   ))}
@@ -264,7 +314,7 @@ export function List() {
               </div>
 
               <div className="col-span-3 hidden xl:block">
-                <View pokemon={pokemon} />
+                <View loading={loading} onConcluded={onConcluded} pokemon={pokemon} />
               </div>
             </div>
 
@@ -274,12 +324,12 @@ export function List() {
           </Fragment>
         )}
 
-        {!pokemons.length && <Empty />}
+        {initialize && !pokemons.length && <Empty />}
       </div>
 
       <Drawer expanded={expand} open={open} onChange={setExpand} onClose={onDrawerClose}>
-        <View pokemon={pokemon} />
+        <View loading={loading} onConcluded={onConcluded} pokemon={pokemon} />
       </Drawer>
-    </Spin.Loading>
+    </Fragment>
   );
 }

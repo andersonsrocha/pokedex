@@ -8,12 +8,14 @@ import { HeightIcon } from "@radix-ui/react-icons";
 import { WeightIcon } from "@icons";
 
 type Props = {
+  loading?: boolean;
   pokemon: Pokemon;
   onClick?: () => void;
+  onConcluded: (loading: boolean) => void;
 };
 
 export function Card(props: Props) {
-  const { pokemon: poke, onClick } = props;
+  const { pokemon: poke, onClick, onConcluded } = props;
 
   const [loading, setLoading] = useState(false);
   const [variety, setVariety] = useState(0);
@@ -102,7 +104,7 @@ export function Card(props: Props) {
 
       setVariety(newIndex);
       setPokemon(response);
-      setLoading(false);
+      setTimeout(() => setLoading(false), 500);
     }
   };
 
@@ -115,13 +117,16 @@ export function Card(props: Props) {
       const response = await request.json();
 
       setSpecie(response);
-      setLoading(false);
+      setTimeout(() => {
+        setLoading(false);
+        onConcluded(true);
+      }, 500);
     })();
   }, []);
 
   return (
-    <div className="h-[390px]">
-      <Spin.Spinner spinning={loading}>
+    <Spin.Skeleton spinning={props.loading || loading}>
+      <div className="h-[390px]">
         <div
           onClick={onClick}
           className="hover:shadow-lg cursor-pointer md:hover:scale-105 transition duration-300 ease-in-out dark:hover:shadow-white/10"
@@ -229,7 +234,7 @@ export function Card(props: Props) {
             </div>
           )}
         </div>
-      </Spin.Spinner>
-    </div>
+      </div>
+    </Spin.Skeleton>
   );
 }
