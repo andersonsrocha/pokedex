@@ -45,7 +45,7 @@ export function Evolution({ chain, onClick }: Props) {
       setEvolution(pokemons);
       setLoading(false);
     })();
-  }, []);
+  }, [chain]);
 
   return (
     <Spin.Spinner spinning={loading}>

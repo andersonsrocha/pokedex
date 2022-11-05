@@ -31,7 +31,7 @@ import {
   SteelIcon,
   WaterIcon,
 } from "@icons";
-import { MagnifyingGlassIcon, OpacityIcon } from "@radix-ui/react-icons";
+import { ArrowUpIcon, MagnifyingGlassIcon, OpacityIcon } from "@radix-ui/react-icons";
 
 import { NamedPokemon, Pokemon, Typing } from "@types";
 
@@ -44,52 +44,13 @@ export function List() {
   const input = useRef<HTMLInputElement>(null);
 
   const [lastIndex, setLastIndex] = useState(0);
-  const [search, setSearch] = useState("");
   const [type, setType] = useState<Typing>();
-  const [filter, setFilter] = useState<Filters>({ search: "" });
   const [expand, setExpand] = useState(false);
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(true);
   const [pokemon, setPokemon] = useState<Pokemon>();
   const [pokemons, setPokemons] = useState<Array<Pokemon>>([]);
   const [pagination, setPagination] = useState<PaginationProps>({ count: 0, pageNumber: 1 });
-
-  /**
-   * A função responsável por realizar a filtragem da lista por nome.
-   * Quando acionado o filtro por tipo, valida se o id dos itens está dentro do range máximo
-   * {@link lastIndex} e realiza a páginação após a filtragem por tipo e nome.
-   *
-   * @param {Array<NamedPokemon>} list lista de pokemons retornados pela API.
-   * @param {number} pageNumber número da página atual.
-   * @param {number} pageSize número da quantidade de itens por página.
-   * @param {number} last número do último pokemon disponível.
-   * @returns retorna um objeto contendo a quantidade total e a lista de itens da página atual.
-   */
-  const find = useCallback(
-    (list: Array<NamedPokemon>, pageNumber: number, pageSize: number, last: number) => {
-      const { search } = filter;
-      const value = search.toLowerCase();
-
-      // caso o filtro por tipo esteja em vigor
-      // filtra a lista por espécie.
-      list = list.filter((x) => {
-        const url = x.url.split("/pokemon")[1];
-        const id = url.replace(/\D/g, "");
-        return Number(id) <= last;
-      });
-
-      let pokemons: Array<NamedPokemon> = list;
-      if (search) pokemons = pokemons.filter((x) => x.name.toLowerCase().includes(value));
-
-      const sliced = pokemons.slice(
-        (pageNumber - 1) * pageSize,
-        (pageNumber - 1) * pageSize + pageSize
-      );
-
-      return { count: list.length, results: sliced };
-    },
-    [filter]
-  );
 
   /**
    * Função responsável por exibir detalhes de um pokemon ao clicar em um card.
@@ -114,9 +75,12 @@ export function List() {
   }, []);
 
   /**
+   * Função responsável por realizar o filtro dos pokemons pelo tipo.
+   * Quando acionado, se o valor do campo de busca {@link input.current.value} estiver definido,
+   * após a requisição, realiza um filtro por nome. Caso o campo de busca não tenha sido definido,
+   * vai retornar os pokemons apenas pelo tipo.
    *
-   * @param value
-   * @param find
+   * @param {Typing} value valor definido no tipo do pokemon.
    */
   const onTypeChanged = useCallback(
     async (value: Typing) => {
@@ -153,7 +117,14 @@ export function List() {
   );
 
   /**
+   * Função responsável por filtrar a lista quando o formulário é submetido.
+   * Quando acionado, se o tipo estiver definido chama a função para buscar os tipos e filtra
+   * {@link onTypeChanged}. Caso o tipo não tenha sido definido e o valor do campo de busca tenha
+   * sido definido {@link input.current.value} realiza a busca e filtro dos pokemons pelo nome.
+   * Caso nenhuma das condições tenha sido atendida, reseta a paginação.
    *
+   * @param {FormEvent<HTMLFormElement>} e evento disparado pelo formulário quando é submetido.
+   * @param {Typing=} type valor do tipo caso tenha sido definido na busca.
    */
   const onSearch = useCallback(
     async (e: FormEvent<HTMLFormElement>, type?: Typing) => {
@@ -185,11 +156,9 @@ export function List() {
         setPokemon(list[0]);
         setPokemons(list);
         setPagination((pag) => ({ ...pag, pageNumber: 1, count: newList.length }));
-        setSearch(inputValue);
         setLoading(false);
       } else {
         setPagination((pag) => ({ ...pag, pageNumber: 1 }));
-        setSearch("");
       }
     },
     [onTypeChanged]
@@ -203,14 +172,30 @@ export function List() {
     setOpen(false);
   }, []);
 
+  /**
+   * Função responsável por paginar a listagem.
+   * Quando acionado, caso o valor do campo de busca ou o tipo do pokemon tenha sido definido,
+   * realiza a paginação, caso não, retorna a lista completa.
+   *
+   * @param {Array<Pokemon>} list lista de pokemons a serem paginada, ou não.
+   * @param {PaginationProps} param1 objeto de paginação.
+   * @returns lista de pokemons paginada.
+   */
   const onSliceList = (list: Array<Pokemon>, { pageNumber, pageSize = 21 }: PaginationProps) => {
-    if (search || type) {
+    if (input.current?.value || type) {
       return list.slice((pageNumber - 1) * pageSize, (pageNumber - 1) * pageSize + pageSize);
     }
 
     return list;
   };
 
+  const onScrollTop = () => {
+    document.documentElement.scrollTop = 0;
+  };
+
+  /**
+   * Define a quantidade máxima de pokemons para o caso da busca de pokemons por tipo.
+   */
   useEffect(() => {
     (async () => {
       const request = await fetch("https://pokeapi.co/api/v2/pokemon-species");
@@ -219,9 +204,16 @@ export function List() {
     })();
   }, []);
 
+  /**
+   * Realizar a busca da listagem sempre que a página é alterada.
+   * Quando acionado, coloca a tela em carregamento, pega a URL e aciona a busca.
+   * Para cada item da lista retornado, busca o pokemon na API.
+   * No final do processo, abre o primeiro pokemon da lista, adiciona a lista
+   * para ser renderizada e finaliza o carregamento da página.
+   */
   useEffect(() => {
     (async () => {
-      if (search || type) return;
+      if (input.current?.value || type) return;
 
       setLoading(true);
 
@@ -245,16 +237,7 @@ export function List() {
       setPagination((pag) => ({ ...pag, count: response.count }));
       setLoading(false);
     })();
-  }, [pagination.pageNumber, search, type]);
-
-  /**
-   * Realizar a busca da listagem.
-   * Quando acionado, coloca a tela em carregamento, pega a URL e aciona a busca.
-   * Para cada item da lista retornado, busca o pokemon na API.
-   * Se for a primeira inicialização, define a quantidade máxima de pokemons.
-   * No final do processo, abre o primeiro pokemon da lista, adiciona a lista
-   * para ser renderizada e finaliza o carregamento da página.
-   */
+  }, [pagination.pageNumber, type]);
 
   return (
     <Fragment>
@@ -267,14 +250,13 @@ export function List() {
                   ref={input}
                   type="search"
                   name="search"
-                  defaultValue={search}
                   placeholder="Pesquisar"
                   addonBefore={<MagnifyingGlassIcon />}
                 />
 
                 <Select
                   placeholder="Tipo"
-                  value={filter.type}
+                  value={type}
                   icon={<OpacityIcon />}
                   onChange={onTypeChanged}
                 >
@@ -422,6 +404,15 @@ export function List() {
 
           {!pokemons.length && <Empty />}
         </Spin.Loading>
+      </div>
+
+      <div className="fixed bottom-6 right-10 ">
+        <button
+          onClick={onScrollTop}
+          className="w-10 h-10 rounded-full text-text-dark bg-secondary-500 flex justify-center items-center"
+        >
+          <ArrowUpIcon width={24} />
+        </button>
       </div>
 
       <Drawer expanded={expand} open={open} onChange={setExpand} onClose={onDrawerClose}>
