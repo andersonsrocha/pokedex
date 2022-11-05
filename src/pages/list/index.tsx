@@ -1,4 +1,4 @@
-import { createRef, FormEvent, Fragment, useEffect, useState } from "react";
+import { FormEvent, Fragment, useCallback, useEffect, useRef, useState } from "react";
 import {
   Card,
   Drawer,
@@ -41,135 +41,233 @@ type Filters = {
 };
 
 export function List() {
-  const input = createRef<HTMLInputElement>();
+  const input = useRef<HTMLInputElement>(null);
 
   const [lastIndex, setLastIndex] = useState(0);
+  const [search, setSearch] = useState("");
+  const [type, setType] = useState<Typing>();
   const [filter, setFilter] = useState<Filters>({ search: "" });
   const [expand, setExpand] = useState(false);
   const [open, setOpen] = useState(false);
-  const [initialize, setInitialize] = useState(false);
   const [loading, setLoading] = useState(true);
   const [pokemon, setPokemon] = useState<Pokemon>();
   const [pokemons, setPokemons] = useState<Array<Pokemon>>([]);
   const [pagination, setPagination] = useState<PaginationProps>({ count: 0, pageNumber: 1 });
 
-  const find = (list: Array<NamedPokemon>, pageNumber: number, pageSize: number) => {
-    const { search } = filter;
-    const value = search.toLowerCase();
+  /**
+   * A função responsável por realizar a filtragem da lista por nome.
+   * Quando acionado o filtro por tipo, valida se o id dos itens está dentro do range máximo
+   * {@link lastIndex} e realiza a páginação após a filtragem por tipo e nome.
+   *
+   * @param {Array<NamedPokemon>} list lista de pokemons retornados pela API.
+   * @param {number} pageNumber número da página atual.
+   * @param {number} pageSize número da quantidade de itens por página.
+   * @param {number} last número do último pokemon disponível.
+   * @returns retorna um objeto contendo a quantidade total e a lista de itens da página atual.
+   */
+  const find = useCallback(
+    (list: Array<NamedPokemon>, pageNumber: number, pageSize: number, last: number) => {
+      const { search } = filter;
+      const value = search.toLowerCase();
 
-    list = list.filter((x) => {
-      const url = x.url.split("pokemon/")[1];
-      const id = url.replace(/\D/g, "");
-      return Number(id) <= lastIndex;
-    });
+      // caso o filtro por tipo esteja em vigor
+      // filtra a lista por espécie.
+      list = list.filter((x) => {
+        const url = x.url.split("/pokemon")[1];
+        const id = url.replace(/\D/g, "");
+        return Number(id) <= last;
+      });
 
-    let pokemons: Array<NamedPokemon> = list;
+      let pokemons: Array<NamedPokemon> = list;
+      if (search) pokemons = pokemons.filter((x) => x.name.toLowerCase().includes(value));
 
-    if (search) pokemons = pokemons.filter((x) => x.name.toLowerCase().includes(value));
+      const sliced = pokemons.slice(
+        (pageNumber - 1) * pageSize,
+        (pageNumber - 1) * pageSize + pageSize
+      );
 
-    const sliced = pokemons.slice(
-      (pageNumber - 1) * pageSize,
-      (pageNumber - 1) * pageSize + pageSize
-    );
+      return { count: list.length, results: sliced };
+    },
+    [filter]
+  );
 
-    return {
-      count: list.length,
-      results: sliced,
-    };
-  };
-
-  const onCardClick = (pokemon: Pokemon) => {
+  /**
+   * Função responsável por exibir detalhes de um pokemon ao clicar em um card.
+   * Quando acionada abre o drawer (caso seja mobile) e exibe ao lado o pokemon selecionado (caso seja desktop).
+   *
+   * @param {Pokemon} pokemon pokemon acionado pelo clique.
+   */
+  const onCardClick = useCallback((pokemon: Pokemon) => {
     setOpen(true);
     setExpand(true);
     setPokemon(pokemon);
-  };
+  }, []);
 
-  const onPageChanged = ({ pageNumber, pageSize }: PageChangeEvent) => {
+  /**
+   * Função responsável por alterar a página da listagem.
+   * Quando acionada altera o número e tamanho da página.
+   *
+   * @param {PageChangeEvent} param0 objeto da paginação.
+   */
+  const onPageChanged = useCallback(({ pageNumber, pageSize }: PageChangeEvent) => {
     setPagination((pag) => ({ ...pag, pageNumber, pageSize }));
-  };
+  }, []);
 
-  const onFilterChanged = (key: keyof Filters, value: unknown, e?: FormEvent<HTMLFormElement>) => {
-    e?.preventDefault();
-    setPagination((pag) => ({ ...pag, pageNumber: 1 }));
-    setFilter((filter) => ({ ...filter, [key]: value }));
-  };
+  /**
+   *
+   * @param value
+   * @param find
+   */
+  const onTypeChanged = useCallback(
+    async (value: Typing) => {
+      setLoading(true);
 
-  const onDrawerClose = () => {
+      const request = await fetch(`https://pokeapi.co/api/v2/type/${value}`);
+      const response = await request.json();
+
+      const results = (response.pokemon as Array<any>).map<NamedPokemon>(
+        (pokemon: any) => pokemon.pokemon
+      );
+
+      const find = input.current?.value;
+      const filtered = results.filter((x) => {
+        const url = x.url.split("/pokemon")[1];
+        const id = url.replace(/\D/g, "");
+        return Number(id) <= lastIndex && (!find || x.name.includes(find));
+      });
+
+      const list: Array<Pokemon> = [];
+      for (const item of filtered) {
+        const request = await fetch(item.url);
+        const pokemon = (await request.json()) as Pokemon;
+        list.push(pokemon);
+      }
+
+      setPokemon(list[0]);
+      setPokemons(list);
+      setPagination((pag) => ({ ...pag, pageNumber: 1, count: filtered.length }));
+      setType(value);
+      setLoading(false);
+    },
+    [lastIndex]
+  );
+
+  /**
+   *
+   */
+  const onSearch = useCallback(
+    async (e: FormEvent<HTMLFormElement>, type?: Typing) => {
+      e.preventDefault();
+
+      if (type) {
+        onTypeChanged(type);
+      } else if (input.current && input.current.value) {
+        const inputValue = input.current.value;
+        const value = inputValue.toLowerCase();
+
+        setLoading(true);
+
+        const request = await fetch("https://pokeapi.co/api/v2/pokemon-species?limit=10000");
+        const response = await request.json();
+
+        const { results } = response;
+
+        const predicate = (x: NamedPokemon) => x.name.toLowerCase().includes(value);
+        const newList = (results as Array<NamedPokemon>).filter(predicate);
+
+        const list: Array<Pokemon> = [];
+        for (const item of newList) {
+          const request = await fetch(item.url.replace("-species", ""));
+          const pokemon = (await request.json()) as Pokemon;
+          list.push(pokemon);
+        }
+
+        setPokemon(list[0]);
+        setPokemons(list);
+        setPagination((pag) => ({ ...pag, pageNumber: 1, count: newList.length }));
+        setSearch(inputValue);
+        setLoading(false);
+      } else {
+        setPagination((pag) => ({ ...pag, pageNumber: 1 }));
+        setSearch("");
+      }
+    },
+    [onTypeChanged]
+  );
+
+  /**
+   * Função responsável por fechar o drawer.
+   * Quando acionado, fecha o drawer (versão mobile).
+   */
+  const onDrawerClose = useCallback(() => {
     setOpen(false);
-  };
+  }, []);
 
-  const onConcluded = (concluded: boolean) => {
-    setLoading(!concluded);
-  };
-
-  const compoundURL = () => {
-    const { search, type } = filter;
-    const { pageNumber, pageSize = 21 } = pagination;
-
-    if (type) {
-      return `https://pokeapi.co/api/v2/type/${type}`;
-    } else if (type || search) {
-      return "https://pokeapi.co/api/v2/pokemon-species?limit=10000";
+  const onSliceList = (list: Array<Pokemon>, { pageNumber, pageSize = 21 }: PaginationProps) => {
+    if (search || type) {
+      return list.slice((pageNumber - 1) * pageSize, (pageNumber - 1) * pageSize + pageSize);
     }
 
-    return `https://pokeapi.co/api/v2/pokemon-species?limit=${pageSize}&offset=${
-      (pageNumber - 1) * pageSize
-    }`;
+    return list;
   };
 
   useEffect(() => {
     (async () => {
+      const request = await fetch("https://pokeapi.co/api/v2/pokemon-species");
+      const { count } = await request.json();
+      setLastIndex(count);
+    })();
+  }, []);
+
+  useEffect(() => {
+    (async () => {
+      if (search || type) return;
+
       setLoading(true);
 
       const { pageNumber, pageSize = 21 } = pagination;
-      const { type } = filter;
+      const URL = `https://pokeapi.co/api/v2/pokemon-species?limit=${pageSize}&offset=${
+        (pageNumber - 1) * pageSize
+      }`;
 
-      const url = compoundURL();
-      const request = await fetch(url);
-      let response = await request.json();
+      const request = await fetch(URL);
+      const response = await request.json();
 
-      if (type) {
-        const results = response.pokemon.map((pokemon: any) => pokemon.pokemon);
-        response = find(results, pageNumber, pageSize);
-      } else {
-        response = find(response.results, pageNumber, pageSize);
-      }
-
-      let list: Array<Pokemon> = [];
+      const list: Array<Pokemon> = [];
       for (const item of response.results) {
         const request = await fetch(item.url.replace("-species", ""));
         const pokemon = (await request.json()) as Pokemon;
         list.push(pokemon);
       }
 
-      if (!initialize) {
-        const request = await fetch("https://pokeapi.co/api/v2/pokemon-species");
-        const { count } = await request.json();
-        setLastIndex(count);
-      }
-
       setPokemon(list[0]);
       setPokemons(list);
       setPagination((pag) => ({ ...pag, count: response.count }));
-      setInitialize(true);
+      setLoading(false);
     })();
-  }, [pagination.pageNumber, filter]);
+  }, [pagination.pageNumber, search, type]);
+
+  /**
+   * Realizar a busca da listagem.
+   * Quando acionado, coloca a tela em carregamento, pega a URL e aciona a busca.
+   * Para cada item da lista retornado, busca o pokemon na API.
+   * Se for a primeira inicialização, define a quantidade máxima de pokemons.
+   * No final do processo, abre o primeiro pokemon da lista, adiciona a lista
+   * para ser renderizada e finaliza o carregamento da página.
+   */
 
   return (
     <Fragment>
       <div className="flex flex-col gap-8">
         <div className="shadow-md rounded-md bg-component-light p-4 mb-4 dark:bg-component-dark-600">
           <div className="relative w-full">
-            <form
-              autoComplete="off"
-              onSubmit={(e) => onFilterChanged("search", input.current?.value, e)}
-            >
+            <form autoComplete="off" onSubmit={(e) => onSearch(e, type)}>
               <div className="flex gap-4">
                 <Input
                   ref={input}
-                  defaultValue={filter.search}
                   type="search"
                   name="search"
+                  defaultValue={search}
                   placeholder="Pesquisar"
                   addonBefore={<MagnifyingGlassIcon />}
                 />
@@ -178,7 +276,7 @@ export function List() {
                   placeholder="Tipo"
                   value={filter.type}
                   icon={<OpacityIcon />}
-                  onChange={(value) => onFilterChanged("type", value)}
+                  onChange={onTypeChanged}
                 >
                   <Select.Option
                     value="bug"
@@ -294,41 +392,40 @@ export function List() {
           </div>
         </div>
 
-        {!initialize && <Spin.Loading spinning={loading} />}
+        <Spin.Loading spinning={loading}>
+          {!!pokemons.length && (
+            <Fragment>
+              <div className="grid grid-cols-12 gap-6">
+                <div className="col-span-12 xl:col-span-9">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {onSliceList(pokemons, pagination).map((pokemon) => (
+                      <Card
+                        key={pokemon.name}
+                        loading={loading}
+                        pokemon={pokemon}
+                        onClick={() => onCardClick(pokemon)}
+                      />
+                    ))}
+                  </div>
+                </div>
 
-        {initialize && !!pokemons.length && (
-          <Fragment>
-            <div className="grid grid-cols-12 gap-6">
-              <div className="col-span-12 xl:col-span-9">
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {pokemons.map((pokemon) => (
-                    <Card
-                      key={pokemon.name}
-                      loading={loading}
-                      pokemon={pokemon}
-                      onConcluded={onConcluded}
-                      onClick={() => onCardClick(pokemon)}
-                    />
-                  ))}
+                <div className="col-span-3 hidden xl:block">
+                  <View loading={loading} pokemon={pokemon} />
                 </div>
               </div>
 
-              <div className="col-span-3 hidden xl:block">
-                <View loading={loading} onConcluded={onConcluded} pokemon={pokemon} />
+              <div className="flex justify-center mt-8">
+                <Pagination {...pagination} onChange={onPageChanged} />
               </div>
-            </div>
+            </Fragment>
+          )}
 
-            <div className="flex justify-center">
-              <Pagination {...pagination} onChange={onPageChanged} />
-            </div>
-          </Fragment>
-        )}
-
-        {initialize && !pokemons.length && <Empty />}
+          {!pokemons.length && <Empty />}
+        </Spin.Loading>
       </div>
 
       <Drawer expanded={expand} open={open} onChange={setExpand} onClose={onDrawerClose}>
-        <View loading={loading} onConcluded={onConcluded} pokemon={pokemon} />
+        <View loading={loading} pokemon={pokemon} />
       </Drawer>
     </Fragment>
   );

@@ -10,11 +10,10 @@ import { Chain, Pokemon, Specie } from "@types";
 type Props = {
   loading?: boolean;
   pokemon?: Pokemon;
-  onConcluded: (loading: boolean) => void;
 };
 
 export function View(props: Props) {
-  const { pokemon: poke, onConcluded } = props;
+  const { pokemon: poke } = props;
 
   const [tab, setTab] = useState(0);
   const [genre, setGenre] = useState(1);
@@ -185,7 +184,6 @@ export function View(props: Props) {
         setPokemon(poke);
         setSpecie(specie);
         setLoading(false);
-        onConcluded(true);
       })();
     }
   }, [poke]);

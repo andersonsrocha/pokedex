@@ -11,11 +11,10 @@ type Props = {
   loading?: boolean;
   pokemon: Pokemon;
   onClick?: () => void;
-  onConcluded: (loading: boolean) => void;
 };
 
 export function Card(props: Props) {
-  const { pokemon: poke, onClick, onConcluded } = props;
+  const { pokemon: poke, onClick } = props;
 
   const [loading, setLoading] = useState(false);
   const [variety, setVariety] = useState(0);
@@ -117,10 +116,7 @@ export function Card(props: Props) {
       const response = await request.json();
 
       setSpecie(response);
-      setTimeout(() => {
-        setLoading(false);
-        onConcluded(true);
-      }, 500);
+      setTimeout(() => setLoading(false), 500);
     })();
   }, []);
 
@@ -159,7 +155,7 @@ export function Card(props: Props) {
                 <div className="capitalize">{pokemon.name}</div>
               </div>
 
-              <div className="bg-component-light text-sm shadow-2xl flex flex-col gap-4 flex-1 rounded-t-2xl rounded-b-lg p-4 dark:text-text-light">
+              <div className="bg-component-light text-sm flex flex-col gap-4 flex-1 rounded-t-2xl rounded-b-lg p-4 text-text-light">
                 <div className={`grid grid-cols-${typeLen}`}>
                   {pokemon.types.map(({ type }, index) => (
                     <div key={index} className="flex justify-center">

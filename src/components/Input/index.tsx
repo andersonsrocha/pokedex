@@ -1,10 +1,10 @@
-import { forwardRef, InputHTMLAttributes, LegacyRef, ReactNode } from "react";
+import { ForwardedRef, forwardRef, InputHTMLAttributes, ReactNode } from "react";
 
 interface Props extends InputHTMLAttributes<HTMLInputElement> {
   addonBefore?: ReactNode;
 }
 
-export const Input = forwardRef((props: Props, ref: React.Ref<HTMLInputElement>) => {
+export const Input = forwardRef((props: Props, ref: ForwardedRef<HTMLInputElement>) => {
   const { addonBefore, ...restProps } = props;
 
   return (
@@ -16,8 +16,8 @@ export const Input = forwardRef((props: Props, ref: React.Ref<HTMLInputElement>)
       )}
 
       <input
-        ref={ref}
         {...restProps}
+        ref={ref}
         className="font-brand outline-none h-8 block p-4 pl-10 w-full text-sm bg-component-light rounded-sm border border-divide-light dark:bg-component-dark-600 dark:border-divide-dark"
       />
     </div>
