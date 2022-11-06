@@ -57,6 +57,8 @@ export function Evolution({ chain, onClick }: Props) {
                 <div key={index} className="w-full">
                   <Img
                     width={60}
+                    onClick={() => onClick?.(poke)}
+                    className="hover:scale-110 cursor-pointer"
                     src={poke.sprites.other["official-artwork"].front_default}
                     alt="icon"
                   />

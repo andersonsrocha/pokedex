@@ -18,8 +18,10 @@ export function Img(props: Props) {
     const image = new Image();
     image.src = src;
     image.onload = () => {
-      setImg(src);
-      setLoading(false);
+      setTimeout(() => {
+        setImg(src);
+        setLoading(false);
+      }, 300);
     };
   }, [src]);
 
@@ -27,7 +29,7 @@ export function Img(props: Props) {
     <img
       src={img}
       {...restProps}
-      className={classNames(className, { "blur-md": loading, "blur-none": !loading })}
+      className={classNames(className, { "blur-sm": loading, "blur-none": !loading })}
     />
   );
 }

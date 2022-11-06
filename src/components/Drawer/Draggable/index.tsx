@@ -36,7 +36,7 @@ export function Draggable({ children, open, expanded }: Props) {
         {...listeners}
         {...attributes}
         className={classNames(
-          "relative flex flex-shrink-0 box-border items-center justify-center bg-secondary border-b border-divide rounded-t-3xl h-10 text-xl text-white p-4 touch-none cursor-grab before:absolute before:w-[50px] before:h-[3px] before:bg-white/20 before:transition-colors before:duration-[0.2s]",
+          "relative flex flex-shrink-0 box-border items-center justify-center bg-secondary border-b border-divide rounded-t-3xl h-10 text-xl text-white p-4 touch-none cursor-grab before:absolute before:w-[50px] before:h-[3px] before:bg-white/20 before:transition-colors before:duration-2000",
           { "cursor-grabbing before:bg-white/30": isDragging }
         )}
       />

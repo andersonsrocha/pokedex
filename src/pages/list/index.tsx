@@ -31,14 +31,9 @@ import {
   SteelIcon,
   WaterIcon,
 } from "@icons";
-import { ArrowUpIcon, MagnifyingGlassIcon, OpacityIcon } from "@radix-ui/react-icons";
+import { MagnifyingGlassIcon, OpacityIcon } from "@radix-ui/react-icons";
 
 import { NamedPokemon, Pokemon, Typing } from "@types";
-
-type Filters = {
-  search: string;
-  type?: Typing;
-};
 
 export function List() {
   const input = useRef<HTMLInputElement>(null);
@@ -93,7 +88,7 @@ export function List() {
         (pokemon: any) => pokemon.pokemon
       );
 
-      const find = input.current?.value;
+      const find = input.current?.value?.toLowerCase();
       const filtered = results.filter((x) => {
         const url = x.url.split("/pokemon")[1];
         const id = url.replace(/\D/g, "");
@@ -187,10 +182,6 @@ export function List() {
     }
 
     return list;
-  };
-
-  const onScrollTop = () => {
-    document.documentElement.scrollTop = 0;
   };
 
   /**
@@ -392,7 +383,7 @@ export function List() {
                 </div>
 
                 <div className="col-span-3 hidden xl:block">
-                  <View loading={loading} pokemon={pokemon} />
+                  <View loading={loading} pokemon={pokemon} onChange={setPokemon} />
                 </div>
               </div>
 
@@ -404,15 +395,6 @@ export function List() {
 
           {!pokemons.length && <Empty />}
         </Spin.Loading>
-      </div>
-
-      <div className="fixed bottom-6 right-10 ">
-        <button
-          onClick={onScrollTop}
-          className="w-10 h-10 rounded-full text-text-dark bg-secondary-500 flex justify-center items-center"
-        >
-          <ArrowUpIcon width={24} />
-        </button>
       </div>
 
       <Drawer expanded={expand} open={open} onChange={setExpand} onClose={onDrawerClose}>

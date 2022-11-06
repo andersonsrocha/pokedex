@@ -45,26 +45,16 @@ function Spinner({ spinning, children }: Props) {
 function Skeleton({ spinning, children }: Props) {
   return (
     <Fragment>
-      <div
-        className={classNames(
-          "h-[390px] cursor-pointer bg-component-light rounded-lg items-center flex-col gap-2 p-4 dark:bg-component-dark-600",
-          { "opacity-100 flex": spinning, "opacity-0 hidden": !spinning }
-        )}
-      >
-        <div className="h-6 w-14 rounded-sm bg-gray-400/30 animate-pulse" />
-        <div className="h-[100px] w-[100px] rounded-full bg-gray-400/30 animate-pulse" />
-        <div className="h-6 w-40 rounded-sm bg-gray-400/30 animate-pulse" />
-        <div className="w-full flex-1 rounded-sm bg-gray-400/30 animate-pulse" />
-      </div>
+      {spinning && (
+        <div className="h-[390px] cursor-pointer bg-component-light rounded-lg items-center flex flex-col gap-2 p-4 dark:bg-component-dark-600">
+          <div className="h-6 w-14 rounded-sm bg-gray-400/30 animate-pulse" />
+          <div className="h-[100px] w-[100px] rounded-full bg-gray-400/30 animate-pulse" />
+          <div className="h-6 w-40 rounded-sm bg-gray-400/30 animate-pulse" />
+          <div className="w-full flex-1 rounded-sm bg-gray-400/30 animate-pulse" />
+        </div>
+      )}
 
-      <div
-        className={classNames("animate-in fade-in duration-1000", {
-          "opacity-100 block": !spinning,
-          "opacity-0 hidden": spinning,
-        })}
-      >
-        {children}
-      </div>
+      {!spinning && children}
     </Fragment>
   );
 }

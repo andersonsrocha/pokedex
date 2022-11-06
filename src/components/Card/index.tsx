@@ -1,4 +1,4 @@
-import React, { useEffect, useState, MouseEvent } from "react";
+import React, { useEffect, useState, MouseEvent, Fragment } from "react";
 import { getType, getTypeIcon } from "@utils";
 import { Img, Spin, Stats } from "@components";
 import classNames from "classnames";
@@ -125,7 +125,7 @@ export function Card(props: Props) {
       <div className="h-[390px]">
         <div
           onClick={onClick}
-          className="hover:shadow-lg cursor-pointer md:hover:scale-105 transition duration-300 ease-in-out dark:hover:shadow-white/10"
+          className="hover:shadow-lg cursor-pointer md:hover:scale-105 dark:hover:shadow-white/10"
         >
           {specie && (
             <div

@@ -10,10 +10,11 @@ import { Chain, Pokemon, Specie } from "@types";
 type Props = {
   loading?: boolean;
   pokemon?: Pokemon;
+  onChange?: (pokemon: Pokemon) => void;
 };
 
 export function View(props: Props) {
-  const { pokemon: poke } = props;
+  const { pokemon: poke, onChange } = props;
 
   const [tab, setTab] = useState(0);
   const [genre, setGenre] = useState(1);
@@ -99,9 +100,9 @@ export function View(props: Props) {
     if (specie) {
       const { varieties } = specie;
       const names = varieties.map((v) => v.pokemon.name);
-      const female = names.some((name) => name.includes("female"));
+      const femaleInVarienties = names.some((name) => name.includes("female"));
 
-      if (genre == 2 && female) {
+      if (genre == 2 && femaleInVarienties) {
         const url = specie.varieties[genre - 1].pokemon.url;
         const split = url.split("/");
 
@@ -351,7 +352,7 @@ export function View(props: Props) {
                   </div>
                 )}
 
-                {tab === 2 && evolution && <Evolution chain={evolution} />}
+                {tab === 2 && evolution && <Evolution chain={evolution} onClick={onChange} />}
               </div>
             </div>
           </div>
