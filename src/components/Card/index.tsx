@@ -1,11 +1,16 @@
-import React, { useEffect, useState, MouseEvent, Fragment } from "react";
-import { getType, getTypeIcon } from "@utils";
+import React, { useEffect, useState, MouseEvent } from "react";
+import {
+  getBorderClassName,
+  getGradientClassName,
+  getFillColorClassName,
+  getTextClassName,
+  getTypeIcon,
+} from "@utils";
+import { WeightIcon } from "@icons";
+import { HeightIcon } from "@radix-ui/react-icons";
 import { Img, Spin, Stats } from "@components";
-import classNames from "classnames";
 
 import { Pokemon, Specie } from "@types";
-import { HeightIcon } from "@radix-ui/react-icons";
-import { WeightIcon } from "@icons";
 
 type Props = {
   loading?: boolean;
@@ -20,55 +25,6 @@ export function Card(props: Props) {
   const [variety, setVariety] = useState(0);
   const [pokemon, setPokemon] = useState<Pokemon>(poke);
   const [specie, setSpecie] = useState<Specie>();
-
-  const pokeNumber = String(pokemon.id).padStart(3, "0");
-  const typeLen = pokemon.types.length;
-
-  const getGradientClassName = (position: number) => {
-    return classNames({
-      "to-secondary-500 from-bug-500": getType(pokemon, position) === "bug",
-      "to-secondary-500 from-dark-500": getType(pokemon, position) === "dark",
-      "to-secondary-500 from-dragon-500": getType(pokemon, position) === "dragon",
-      "to-secondary-500 from-electric-500": getType(pokemon, position) === "electric",
-      "to-secondary-500 from-fairy-500": getType(pokemon, position) === "fairy",
-      "to-secondary-500 from-fighting-500": getType(pokemon, position) === "fighting",
-      "to-secondary-500 from-fire-500": getType(pokemon, position) === "fire",
-      "to-secondary-500 from-flying-500": getType(pokemon, position) === "flying",
-      "to-secondary-500 from-ghost-500": getType(pokemon, position) === "ghost",
-      "to-secondary-500 from-grass-500": getType(pokemon, position) === "grass",
-      "to-secondary-500 from-ground-500": getType(pokemon, position) === "ground",
-      "to-secondary-500 from-ice-500": getType(pokemon, position) === "ice",
-      "to-secondary-500 from-normal-500": getType(pokemon, position) === "normal",
-      "to-secondary-500 from-poison-500": getType(pokemon, position) === "poison",
-      "to-secondary-500 from-psychic-500": getType(pokemon, position) === "psychic",
-      "to-secondary-500 from-rock-500": getType(pokemon, position) === "rock",
-      "to-secondary-500 from-steel-500": getType(pokemon, position) === "steel",
-      "to-secondary-500 from-water-500": getType(pokemon, position) === "water",
-    });
-  };
-
-  const getColorClassName = (position: number) => {
-    return classNames({
-      "text-bug-500 border-bug-500": getType(pokemon, position) === "bug",
-      "text-dark-500 border-dark-500": getType(pokemon, position) === "dark",
-      "text-dragon-500 border-dragon-500": getType(pokemon, position) === "dragon",
-      "text-electric-500 border-electric-500": getType(pokemon, position) === "electric",
-      "text-fairy-500 border-fairy-500": getType(pokemon, position) === "fairy",
-      "text-fighting-500 border-fighting-500": getType(pokemon, position) === "fighting",
-      "text-fire-500 border-fire-500": getType(pokemon, position) === "fire",
-      "text-flying-500 border-flying-500": getType(pokemon, position) === "flying",
-      "text-ghost-500 border-ghost-500": getType(pokemon, position) === "ghost",
-      "text-grass-500 border-grass-500": getType(pokemon, position) === "grass",
-      "text-ground-500 border-ground-500": getType(pokemon, position) === "ground",
-      "text-ice-500 border-ice-500": getType(pokemon, position) === "ice",
-      "text-normal-500 border-normal-500": getType(pokemon, position) === "normal",
-      "text-poison-500 border-poison-500": getType(pokemon, position) === "poison",
-      "text-psychic-500 border-psychic-500": getType(pokemon, position) === "psychic",
-      "text-rock-500 border-rock-500": getType(pokemon, position) === "rock",
-      "text-steel-500 border-steel-500": getType(pokemon, position) === "steel",
-      "text-water-500 border-water-500": getType(pokemon, position) === "water",
-    });
-  };
 
   const getWeight = (weight: number) => {
     return `${weight / 10} kg`;
@@ -111,8 +67,8 @@ export function Card(props: Props) {
     (async () => {
       setLoading(true);
 
-      const { id } = pokemon;
-      const request = await fetch(`https://pokeapi.co/api/v2/pokemon-species/${id}`);
+      const { species } = pokemon;
+      const request = await fetch(species.url);
       const response = await request.json();
 
       setSpecie(response);
@@ -120,69 +76,76 @@ export function Card(props: Props) {
     })();
   }, []);
 
+  const pokeNumber = String(pokemon.id).padStart(3, "0");
+
   return (
     <Spin.Skeleton spinning={props.loading || loading}>
-      <div className="h-[390px]">
-        <div
-          onClick={onClick}
-          className="hover:shadow-lg cursor-pointer md:hover:scale-105 dark:hover:shadow-white/10"
-        >
+      <div onClick={onClick}>
+        <div className="cursor-pointer min-h-[390px] shadow-lg md:hover:scale-105 dark:hover:shadow-white/10">
           {specie && (
             <div
-              className={`flex flex-col h-full rounded-lg bg-gradient-to-br ${getGradientClassName(
-                0
-              )}`}
+              className={`card rounded-lg bg-gradient-to-br ${getGradientClassName(pokemon, 0)}`}
             >
-              <div className="p-2 flex flex-col items-center text-text-dark">
-                {specie.varieties.length > 1 && (
-                  <div className="relative w-full">
+              <div className="card-header p-4 text-center text-white">
+                <div className="number font-extrabold relative">
+                  <div className="number">#{pokeNumber}</div>
+
+                  <div className="form-button" hidden={specie.varieties.length < 2}>
                     <button
                       title="Transform"
-                      className="flex justify-center items-center bg-transparent border border-divide-light absolute right-0 w-6 h-6 rounded-full text-sm hover:bg-gray-100"
+                      className="flex justify-center items-center bg-transparent border border-divide-light absolute top-0 right-0 w-6 h-6 rounded-full text-sm hover:bg-gray-100"
                       onClick={(e) => onVarietyChanged(e, variety)}
                     >
                       ✨
                     </button>
                   </div>
-                )}
+                </div>
 
-                <div className="font-extrabold">{`#${pokeNumber}`}</div>
-
-                <div className="h-[100px]">
+                <div className="image flex justify-center">
                   <Img alt="poke" width={100} src={getSprite(pokemon)} />
                 </div>
 
-                <div className="capitalize">{pokemon.name}</div>
+                <div className="name capitalize font-extrabold">{pokemon.name}</div>
               </div>
 
-              <div className="bg-component-light text-sm flex flex-col gap-4 flex-1 rounded-t-2xl rounded-b-lg p-4 text-text-light">
-                <div className={`grid grid-cols-${typeLen}`}>
+              <div className="card-content flex flex-col gap-4 bg-white text-text-light rounded-lg p-4">
+                <div className="typing flex justify-center gap-6">
                   {pokemon.types.map(({ type }, index) => (
-                    <div key={index} className="flex justify-center">
-                      <div
-                        className={`rounded-md py-1/2 px-2 capitalize border-2 drop-shadow-[0_0_4px] flex justify-center items-center gap-1 ${getColorClassName(
-                          index
-                        )}`}
-                      >
-                        {React.createElement(getTypeIcon(type.name), { className: "w-3" })}
-                        {type.name}
+                    <div
+                      key={index}
+                      className={`border-2 ${getBorderClassName(type.name)} 
+                    drop-shadow-[0_0_4px] ${getTextClassName(type.name)} 
+                    px-2 py-px rounded-md`}
+                    >
+                      <div className="flex gap-1">
+                        <div className="type-icon">
+                          {React.createElement(getTypeIcon(type.name), {
+                            className: `w-3 ${getFillColorClassName(type.name)}`,
+                          })}
+                        </div>
+                        <div className="type-name capitalize">{type.name}</div>
                       </div>
                     </div>
                   ))}
                 </div>
 
-                <div className="grid grid-cols-2 divide-x">
-                  <div className="flex justify-center items-center gap-1">
-                    <WeightIcon />
-                    {getWeight(pokemon.weight)}
+                <div className="format grid grid-cols-2 gap-2 text-xs">
+                  <div className="flex justify-center items-center gap-1 border border-divide-light rounded-3xl bg-black/5 p-2">
+                    <div className="format-icon">
+                      <WeightIcon />
+                    </div>
+                    <div className="format-value">{getWeight(pokemon.weight)}</div>
                   </div>
-                  <div className="flex justify-center items-center gap-1">
-                    <HeightIcon />
-                    {getHeight(pokemon.height)}
+
+                  <div className="flex justify-center items-center gap-1 border border-divide-light rounded-3xl bg-black/5 p-2">
+                    <div className="format-icon">
+                      <HeightIcon />
+                    </div>
+                    <div className="format-value">{getHeight(pokemon.height)}</div>
                   </div>
                 </div>
 
-                <div>
+                <div className="stats text-xs">
                   <div className="grid grid-cols-12 items-center">
                     <div className="col-span-3 font-bold">HP</div>
                     <div className="col-span-2">{pokemon.stats[0].base_stat}</div>

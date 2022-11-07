@@ -17,7 +17,7 @@ export function Main({ children }: Props) {
       <div className="fixed bottom-20 right-4">
         <button
           onClick={onScrollTop}
-          className="w-10 h-10 rounded-full text-text-dark bg-secondary-500 flex justify-center items-center"
+          className="w-10 h-10 shadow-md shadow-black/40 rounded-full text-text-light flex justify-center items-center bg-component-light dark:text-text-dark dark:bg-component-dark-600"
         >
           <ArrowUpIcon width={24} />
         </button>

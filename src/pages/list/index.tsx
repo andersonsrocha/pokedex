@@ -1,4 +1,4 @@
-import { FormEvent, Fragment, useCallback, useEffect, useRef, useState } from "react";
+import React, { FormEvent, Fragment, useCallback, useEffect, useRef, useState } from "react";
 import {
   Card,
   Drawer,
@@ -11,34 +11,17 @@ import {
   Spin,
   View,
 } from "@components";
-import {
-  BugIcon,
-  DarkIcon,
-  DragonIcon,
-  ElectricIcon,
-  FairyIcon,
-  FightingIcon,
-  FireIcon,
-  FlyingIcon,
-  GhostIcon,
-  GrassIcon,
-  GroundIcon,
-  IceIcon,
-  NormalIcon,
-  PoisonIcon,
-  PsychicIcon,
-  RockIcon,
-  SteelIcon,
-  WaterIcon,
-} from "@icons";
 import { MagnifyingGlassIcon, OpacityIcon } from "@radix-ui/react-icons";
+import { capitalize, getTypeIcon, getBgClassName } from "@utils";
+import { TYPES } from "@constants";
 
-import { NamedPokemon, Pokemon, Typing } from "@types";
+import { NamedUrl, Pokemon, Typing } from "@types";
 
 export function List() {
   const input = useRef<HTMLInputElement>(null);
 
   const [lastIndex, setLastIndex] = useState(0);
+  const [search, setSearch] = useState("");
   const [type, setType] = useState<Typing>();
   const [expand, setExpand] = useState(false);
   const [open, setOpen] = useState(false);
@@ -84,7 +67,7 @@ export function List() {
       const request = await fetch(`https://pokeapi.co/api/v2/type/${value}`);
       const response = await request.json();
 
-      const results = (response.pokemon as Array<any>).map<NamedPokemon>(
+      const results = (response.pokemon as Array<any>).map<NamedUrl>(
         (pokemon: any) => pokemon.pokemon
       );
 
@@ -115,7 +98,7 @@ export function List() {
    * Função responsável por filtrar a lista quando o formulário é submetido.
    * Quando acionado, se o tipo estiver definido chama a função para buscar os tipos e filtra
    * {@link onTypeChanged}. Caso o tipo não tenha sido definido e o valor do campo de busca tenha
-   * sido definido {@link input.current.value} realiza a busca e filtro dos pokemons pelo nome.
+   * sido definido {@link search} realiza a busca e filtro dos pokemons pelo nome.
    * Caso nenhuma das condições tenha sido atendida, reseta a paginação.
    *
    * @param {FormEvent<HTMLFormElement>} e evento disparado pelo formulário quando é submetido.
@@ -138,8 +121,8 @@ export function List() {
 
         const { results } = response;
 
-        const predicate = (x: NamedPokemon) => x.name.toLowerCase().includes(value);
-        const newList = (results as Array<NamedPokemon>).filter(predicate);
+        const predicate = (x: NamedUrl) => x.name.toLowerCase().includes(value);
+        const newList = (results as Array<NamedUrl>).filter(predicate);
 
         const list: Array<Pokemon> = [];
         for (const item of newList) {
@@ -151,9 +134,11 @@ export function List() {
         setPokemon(list[0]);
         setPokemons(list);
         setPagination((pag) => ({ ...pag, pageNumber: 1, count: newList.length }));
+        setSearch(inputValue);
         setLoading(false);
       } else {
         setPagination((pag) => ({ ...pag, pageNumber: 1 }));
+        setSearch("");
       }
     },
     [onTypeChanged]
@@ -177,7 +162,7 @@ export function List() {
    * @returns lista de pokemons paginada.
    */
   const onSliceList = (list: Array<Pokemon>, { pageNumber, pageSize = 21 }: PaginationProps) => {
-    if (input.current?.value || type) {
+    if (search || type) {
       return list.slice((pageNumber - 1) * pageSize, (pageNumber - 1) * pageSize + pageSize);
     }
 
@@ -204,7 +189,7 @@ export function List() {
    */
   useEffect(() => {
     (async () => {
-      if (input.current?.value || type) return;
+      if (search || type) return;
 
       setLoading(true);
 
@@ -228,7 +213,7 @@ export function List() {
       setPagination((pag) => ({ ...pag, count: response.count }));
       setLoading(false);
     })();
-  }, [pagination.pageNumber, type]);
+  }, [pagination.pageNumber, type, search]);
 
   return (
     <Fragment>
@@ -241,6 +226,7 @@ export function List() {
                   ref={input}
                   type="search"
                   name="search"
+                  defaultValue={search}
                   placeholder="Pesquisar"
                   addonBefore={<MagnifyingGlassIcon />}
                 />
@@ -251,114 +237,23 @@ export function List() {
                   icon={<OpacityIcon />}
                   onChange={onTypeChanged}
                 >
-                  <Select.Option
-                    value="bug"
-                    icon={<BugIcon className="w-3 text-bug-500 drop-shadow-[0_0_4px]" />}
-                  >
-                    Bug
-                  </Select.Option>
-                  <Select.Option
-                    value="dark"
-                    icon={<DarkIcon className="w-3 text-dark-500 drop-shadow-[0_0_4px]" />}
-                  >
-                    Dark
-                  </Select.Option>
-                  <Select.Option
-                    value="dragon"
-                    icon={<DragonIcon className="w-3 text-dragon-500 drop-shadow-[0_0_4px]" />}
-                  >
-                    Dragon
-                  </Select.Option>
-                  <Select.Option
-                    value="electric"
-                    icon={<ElectricIcon className="w-3 text-electric-500 drop-shadow-[0_0_4px]" />}
-                  >
-                    Electric
-                  </Select.Option>
-                  <Select.Option
-                    value="fairy"
-                    icon={<FairyIcon className="w-3 text-fairy-500 drop-shadow-[0_0_4px]" />}
-                  >
-                    Fairy
-                  </Select.Option>
-                  <Select.Option
-                    value="fighting"
-                    icon={<FightingIcon className="w-3 text-fighting-500 drop-shadow-[0_0_4px]" />}
-                  >
-                    Fighting
-                  </Select.Option>
-                  <Select.Option
-                    value="fire"
-                    icon={<FireIcon className="w-3 text-fire-500 drop-shadow-[0_0_4px]" />}
-                  >
-                    Fire
-                  </Select.Option>
-                  <Select.Option
-                    value="flying"
-                    icon={<FlyingIcon className="w-3 text-flying-500 drop-shadow-[0_0_4px]" />}
-                  >
-                    Flying
-                  </Select.Option>
-                  <Select.Option
-                    value="ghost"
-                    icon={<GhostIcon className="w-3 text-ghost-500 drop-shadow-[0_0_4px]" />}
-                  >
-                    Ghost
-                  </Select.Option>
-                  <Select.Option
-                    value="grass"
-                    icon={<GrassIcon className="w-3 text-grass-500 drop-shadow-[0_0_4px]" />}
-                  >
-                    Grass
-                  </Select.Option>
-                  <Select.Option
-                    value="ground"
-                    icon={<GroundIcon className="w-3 text-ground-500 drop-shadow-[0_0_4px]" />}
-                  >
-                    Ground
-                  </Select.Option>
-                  <Select.Option
-                    value="ice"
-                    icon={<IceIcon className="w-3 text-ice-500 drop-shadow-[0_0_4px]" />}
-                  >
-                    Ice
-                  </Select.Option>
-                  <Select.Option
-                    value="normal"
-                    icon={<NormalIcon className="w-3 text-normal-500 drop-shadow-[0_0_4px]" />}
-                  >
-                    Normal
-                  </Select.Option>
-                  <Select.Option
-                    value="poison"
-                    icon={<PoisonIcon className="w-3 text-poison-500 drop-shadow-[0_0_4px]" />}
-                  >
-                    Poison
-                  </Select.Option>
-                  <Select.Option
-                    value="psychic"
-                    icon={<PsychicIcon className="w-3 text-psychic-500 drop-shadow-[0_0_4px]" />}
-                  >
-                    Psychic
-                  </Select.Option>
-                  <Select.Option
-                    value="rock"
-                    icon={<RockIcon className="w-3 text-rock-500 drop-shadow-[0_0_4px]" />}
-                  >
-                    Rock
-                  </Select.Option>
-                  <Select.Option
-                    value="steel"
-                    icon={<SteelIcon className="w-3 text-steel-500 drop-shadow-[0_0_4px]" />}
-                  >
-                    Steel
-                  </Select.Option>
-                  <Select.Option
-                    value="water"
-                    icon={<WaterIcon className="w-3 text-water-500 drop-shadow-[0_0_4px]" />}
-                  >
-                    Water
-                  </Select.Option>
+                  {TYPES.map((type) => (
+                    <Select.Option
+                      key={type}
+                      value={type}
+                      icon={
+                        <div
+                          className={`flex justify-center items-center w-4 h-4 rounded-full ${getBgClassName(
+                            type
+                          )}`}
+                        >
+                          {React.createElement(getTypeIcon(type), { className: "w-3" })}
+                        </div>
+                      }
+                    >
+                      {capitalize(type)}
+                    </Select.Option>
+                  ))}
                 </Select>
               </div>
             </form>
@@ -398,7 +293,7 @@ export function List() {
       </div>
 
       <Drawer expanded={expand} open={open} onChange={setExpand} onClose={onDrawerClose}>
-        <View loading={loading} pokemon={pokemon} />
+        <View loading={loading} pokemon={pokemon} onChange={setPokemon} />
       </Drawer>
     </Fragment>
   );

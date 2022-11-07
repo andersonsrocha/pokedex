@@ -1,11 +1,21 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, MouseEvent } from "react";
 import { FemaleIcon, MaleIcon, WaveIcon } from "@icons";
-import { getType, getTypeIcon } from "@utils";
+import {
+  getBgClassName,
+  getBorderClassName,
+  getFillColorClassName,
+  getStrokeColorClassName,
+  getTextClassName,
+  getType,
+  getTypeIcon,
+  getWeakness,
+} from "@utils";
+import { EyeNoneIcon } from "@radix-ui/react-icons";
 import classNames from "classnames";
 
 import { Spin, Img, Evolution } from "..";
 
-import { Chain, Pokemon, Specie } from "@types";
+import { Chain, Pokemon, Specie, Typing } from "@types";
 
 type Props = {
   loading?: boolean;
@@ -13,16 +23,25 @@ type Props = {
   onChange?: (pokemon: Pokemon) => void;
 };
 
+type Weakness = {
+  "0": Array<[string, number]>;
+  "1/4": Array<[string, number]>;
+  "1/2": Array<[string, number]>;
+  "1": Array<[string, number]>;
+  "2": Array<[string, number]>;
+  "4": Array<[string, number]>;
+};
+
 export function View(props: Props) {
   const { pokemon: poke, onChange } = props;
 
   const [tab, setTab] = useState(0);
-  const [genre, setGenre] = useState(1);
+  const [genre, setGenre] = useState(-1);
+  const [variety, setVariety] = useState(0);
   const [pokemon, setPokemon] = useState<Pokemon>();
   const [specie, setSpecie] = useState<Specie>();
   const [evolution, setEvolution] = useState<Chain>();
-  const [male, setMale] = useState(false);
-  const [female, setFemale] = useState(false);
+  const [weakness, setWeakness] = useState<Weakness>();
   const [loading, setLoading] = useState(false);
 
   const getGradientClassName = (position: number) => {
@@ -52,33 +71,6 @@ export function View(props: Props) {
     return "";
   };
 
-  const getColorClassName = (position: number) => {
-    if (pokemon) {
-      return classNames({
-        "text-bug-500 border-bug-500": getType(pokemon, position) === "bug",
-        "text-divide-light/60 border-dark-500": getType(pokemon, position) === "dark",
-        "text-dragon-500 border-dragon-500": getType(pokemon, position) === "dragon",
-        "text-electric-500 border-electric-500": getType(pokemon, position) === "electric",
-        "text-fairy-500 border-fairy-500": getType(pokemon, position) === "fairy",
-        "text-fighting-500 border-fighting-500": getType(pokemon, position) === "fighting",
-        "text-fire-500 border-fire-500": getType(pokemon, position) === "fire",
-        "text-flying-500 border-flying-500": getType(pokemon, position) === "flying",
-        "text-ghost-500 border-ghost-500": getType(pokemon, position) === "ghost",
-        "text-grass-500 border-grass-500": getType(pokemon, position) === "grass",
-        "text-ground-500 border-ground-500": getType(pokemon, position) === "ground",
-        "text-ice-500 border-ice-500": getType(pokemon, position) === "ice",
-        "text-normal-500 border-normal-500": getType(pokemon, position) === "normal",
-        "text-poison-500 border-poison-500": getType(pokemon, position) === "poison",
-        "text-psychic-500 border-psychic-500": getType(pokemon, position) === "psychic",
-        "text-rock-500 border-rock-500": getType(pokemon, position) === "rock",
-        "text-steel-500 border-steel-500": getType(pokemon, position) === "steel",
-        "text-water-500 border-water-500": getType(pokemon, position) === "water",
-      });
-    }
-
-    return "";
-  };
-
   const getPokemonDescription = (specie: Specie) => {
     const { flavor_text_entries } = specie;
     const flavor_texts = flavor_text_entries.filter((x) => x.language.name == "en");
@@ -94,63 +86,28 @@ export function View(props: Props) {
     return "";
   };
 
-  const getSprite = (pokemon: Pokemon, genre: number) => {
-    let sprite = "";
+  const onVarietyChanged = async (e: MouseEvent, oldIndex: number) => {
+    e.stopPropagation();
 
     if (specie) {
+      setLoading(true);
+
       const { varieties } = specie;
-      const names = varieties.map((v) => v.pokemon.name);
-      const femaleInVarienties = names.some((name) => name.includes("female"));
+      const newIndex = oldIndex == varieties.length - 1 ? 0 : oldIndex + 1;
+      const url = varieties[newIndex].pokemon.url;
+      const request = await fetch(url);
+      const response = (await request.json()) as Pokemon;
 
-      if (genre == 2 && femaleInVarienties) {
-        const url = specie.varieties[genre - 1].pokemon.url;
-        const split = url.split("/");
-
-        const oldNumber = String(pokemon.id);
-        let newNumber = split[split.length - 1];
-
-        if (url.endsWith("/")) newNumber = split[split.length - 2];
-
-        const image = pokemon.sprites.other["official-artwork"].front_default;
-        sprite = image.replace(oldNumber, newNumber);
-      } else if (genre == 2 && male && female && varieties.length < 2) {
-        const number = String(pokemon.id).padStart(3, "0");
-        const endpoint = `${number}_f${genre}`;
-        sprite = `https://assets.pokemon.com/assets/cms2/img/pokedex/full/${endpoint}.png`;
-      } else {
-        // caso não, retorna a forma padrão
-        sprite = pokemon.sprites.other["official-artwork"].front_default;
+      if (response.name.includes("female")) {
+        setGenre(100);
+      } else if (response.name.includes("male")) {
+        setGenre(0);
       }
+
+      setVariety(newIndex);
+      setPokemon(response);
+      setTimeout(() => setLoading(false), 500);
     }
-
-    // se sprite for nula busca em outro banco de dados
-    if (!sprite) {
-      const number = String(pokemon.id).padStart(3, "0");
-      sprite = `https://assets.pokemon.com/assets/cms2/img/pokedex/full/${number}.png`;
-    }
-
-    return sprite;
-  };
-
-  const onGenreChanged = async (genre: 1 | 2) => {
-    if (specie) {
-      const { varieties } = specie;
-      const names = varieties.map((v) => v.pokemon.name);
-      const female = names.some((name) => name.includes("female"));
-
-      if (female) {
-        setLoading(true);
-
-        const url = varieties[genre - 1].pokemon.url;
-        const request = await fetch(url);
-        const response = await request.json();
-
-        setPokemon(response);
-        setLoading(false);
-      }
-    }
-
-    setGenre(genre);
   };
 
   useEffect(() => {
@@ -158,8 +115,8 @@ export function View(props: Props) {
       (async () => {
         setLoading(true);
 
-        const { id } = poke;
-        const request1 = await fetch(`https://pokeapi.co/api/v2/pokemon-species/${id}`);
+        const { species } = poke;
+        const request1 = await fetch(species.url);
         const specie = (await request1.json()) as Specie;
 
         if (specie.evolution_chain) {
@@ -171,23 +128,32 @@ export function View(props: Props) {
         }
 
         if (specie.gender_rate !== -1) {
-          const { varieties } = specie;
-          const names = varieties.map((v) => v.pokemon.name);
-          const female = names.some((name) => name.includes("female"));
           const rate = (specie.gender_rate / 8) * 100;
-          const genre = 100 - rate !== 0 ? 1 : 2;
-
-          setFemale(rate !== 0 || female);
-          setMale(100 - rate !== 0);
-          setGenre(genre);
+          setGenre(rate);
+        } else {
+          setGenre(-1);
         }
+
+        const weakness = getWeakness(...poke.types.map((x) => x.type.name));
+        const entries = Object.entries(weakness);
+        const defense: Weakness = {
+          "0": entries.filter((x) => x[1] === 0),
+          "1/4": entries.filter((x) => x[1] === 0.25),
+          "1/2": entries.filter((x) => x[1] === 0.5),
+          "1": entries.filter((x) => x[1] === 1),
+          "2": entries.filter((x) => x[1] === 2),
+          "4": entries.filter((x) => x[1] === 4),
+        };
 
         setPokemon(poke);
         setSpecie(specie);
+        setWeakness(defense);
         setLoading(false);
       })();
     }
   }, [poke]);
+
+  const pokeNumber = String(pokemon?.id).padStart(3, "0");
 
   return (
     <Spin.Skeleton spinning={props.loading || loading}>
@@ -196,163 +162,322 @@ export function View(props: Props) {
       >
         {pokemon && specie && (
           <div className="flex flex-col gap-4">
-            <div className="header relative z-30">
+            <div className="extra relative z-30">
               <div className="absolute top-0 left-0">
-                <div
-                  className={classNames(
-                    "absolute duration-500 w-10 h-full transition-all left-8 -z-10",
-                    { "-top-12": tab === 0, "-top-4": tab === 1, "top-4": tab === 2 }
-                  )}
-                >
-                  <WaveIcon />
-                </div>
-
-                <ul className="flex flex-col gap-2 w-8 px-1 py-5 bg-white/20 rounded-3xl min-h-[120px]">
-                  <li onClick={() => setTab(0)} className="cursor-pointer">
-                    <Img
-                      className={classNames("duration-400 transition-all", {
-                        "ml-2": tab === 0,
-                      })}
-                      src="https://img.icons8.com/fluency/48/000000/pokeball.png"
-                    />
-                  </li>
-                  <li onClick={() => setTab(1)} className="cursor-pointer">
-                    <Img
-                      className={classNames("duration-400 transition-all", { "ml-2": tab === 1 })}
-                      src="https://img.icons8.com/color/48/000000/superball.png"
-                    />
-                  </li>
-                  <li onClick={() => setTab(2)} className="cursor-pointer">
-                    <Img
-                      className={classNames("duration-400 transition-all", { "ml-2": tab === 2 })}
-                      src="https://img.icons8.com/color/48/000000/ultra-ball.png"
-                    />
-                  </li>
-                </ul>
-              </div>
-
-              {specie.gender_rate > -1 && (
-                <div className="absolute top-0 right-0">
+                <div className="flex">
                   <div
                     className={classNames(
-                      "absolute duration-500 w-10 h-full transition-all right-8 rotate-180 -z-10",
-                      { "-top-1": genre === 1, "top-8": genre === 2 }
+                      "absolute duration-500 w-10 h-full transition-all left-8 -z-10",
+                      {
+                        "-top-16": tab === 0,
+                        "-top-8": tab === 1,
+                        "top-0": tab === 2,
+                        "top-8": tab === 3,
+                      }
                     )}
                   >
-                    <WaveIcon />
+                    <WaveIcon className="fill-black/20 xl:fill-white/20" />
                   </div>
 
-                  <ul className="flex flex-col gap-2 w-8 px-1 py-5 bg-white/20 rounded-3xl">
-                    <li className="cursor-pointer">
-                      <div
-                        className={classNames("w-6 duration-400 transition-all", {
-                          "-ml-1": genre === 1,
+                  <ul className="flex flex-col gap-2 w-8 px-1 py-5 bg-black/20 xl:bg-white/20 rounded-3xl min-h-[120px]">
+                    <li onClick={() => setTab(0)} className="cursor-pointer">
+                      <Img
+                        className={classNames("duration-400 transition-all", {
+                          "ml-2": tab === 0,
                         })}
-                      >
-                        <button
-                          disabled={!male}
-                          onClick={() => onGenreChanged(1)}
-                          className={classNames(
-                            "w-6 border rounded-full p-0.5 border-blue-800 bg-blue-400",
-                            { "cursor-not-allowed opacity-50": !male, "opacity-100": male }
-                          )}
-                        >
-                          <MaleIcon />
-                        </button>
-                      </div>
+                        src="https://img.icons8.com/fluency/48/000000/pokeball.png"
+                      />
                     </li>
-
-                    <li className="cursor-pointer">
-                      <div
-                        className={classNames("w-6 duration-400 transition-all", {
-                          "-ml-1": genre === 2,
-                        })}
-                      >
-                        <button
-                          disabled={!female}
-                          onClick={() => onGenreChanged(2)}
-                          className={classNames(
-                            "border border-pink-800 bg-pink-400 rounded-full p-0.5",
-                            { "cursor-not-allowed opacity-50": !female, "opacity-100": female }
-                          )}
-                        >
-                          <FemaleIcon />
-                        </button>
-                      </div>
+                    <li onClick={() => setTab(1)} className="cursor-pointer">
+                      <Img
+                        className={classNames("duration-400 transition-all", { "ml-2": tab === 1 })}
+                        src="https://img.icons8.com/color/48/000000/superball.png"
+                      />
+                    </li>
+                    <li onClick={() => setTab(2)} className="cursor-pointer">
+                      <Img
+                        className={classNames("duration-400 transition-all", { "ml-2": tab === 2 })}
+                        src="https://img.icons8.com/color/48/000000/ultra-ball.png"
+                      />
+                    </li>
+                    <li onClick={() => setTab(3)} className="cursor-pointer">
+                      <Img
+                        className={classNames("duration-400 transition-all", { "ml-2": tab === 3 })}
+                        src="https://img.icons8.com/color/48/null/mega-ball.png"
+                      />
                     </li>
                   </ul>
                 </div>
+              </div>
+
+              {specie.varieties.length > 1 && (
+                <button
+                  title="Transform"
+                  className="flex justify-center items-center bg-transparent border border-divide-light absolute right-0 w-6 h-6 rounded-full text-sm hover:bg-gray-100"
+                  onClick={(e) => onVarietyChanged(e, variety)}
+                >
+                  ✨
+                </button>
               )}
             </div>
 
-            <div className="main relative text-text-dark text-center z-20">
-              <div className="flex justify-center items-end h-[80px] relative">
-                <Img alt="poke" width={150} src={getSprite(pokemon, genre)} />
+            <div className="card-header text-text-light dark:text-text-dark xl:text-text-dark z-20">
+              <div className="image flex justify-center items-end h-20">
+                <Img
+                  alt="poke"
+                  width={150}
+                  src={pokemon.sprites.other["official-artwork"].front_default}
+                />
               </div>
 
-              <div className="text-text-dark/70">{`#${pokemon.id
-                .toString()
-                .padStart(3, "0")}`}</div>
+              <div className="text-center text-text-light/70 xl:text-text-dark/70 dark:text-text-dark/70">
+                #{pokeNumber}
+              </div>
 
-              <div className="flex flex-col gap-2">
-                <div className="capitalize text-xl">{pokemon.name}</div>
-                <div className="text-white/70 text-sm">{getPokemonGenera(specie)}</div>
-                <div className="flex justify-center gap-2">
-                  {pokemon.types.map(({ type }, index) => (
-                    <div key={index} className="flex justify-center">
-                      <div
-                        className={`rounded-md py-1/2 px-2 capitalize border-2 drop-shadow-[0_0_4px] flex justify-center items-center gap-1 ${getColorClassName(
-                          index
-                        )}`}
-                      >
-                        {React.createElement(getTypeIcon(type.name), { className: "w-3" })}
-                        {type.name}
-                      </div>
-                    </div>
-                  ))}
-                </div>
+              <div className="flex flex-col gap-4">
                 <div className="flex flex-col gap-2">
-                  <div className="text-white">POKÉDEX ENTRY</div>
-                  <div className="text-white/70 text-sm">{getPokemonDescription(specie)}</div>
-                </div>
-              </div>
+                  <div className="info text-center">
+                    <div className="capitalize text-xl font-bold">{pokemon.name}</div>
+                    <div className="text-text-light/70 xl:text-text-dark/70 dark:text-text-dark/70 text-xs">
+                      {getPokemonGenera(specie)}
+                    </div>
+                  </div>
 
-              <div className="mt-3">
-                {tab === 0 && (
-                  <div className="flex flex-col gap-2">
-                    <div className="text-white">ABILITIES</div>
-                    <div className="text-white/70 text-sm capitalize w-full flex justify-center flex-wrap gap-2">
-                      {pokemon.abilities.map((x, i) => (
-                        <div
-                          key={i}
-                          className="w-[45%] border border-divide-light p-2 rounded-3xl bg-white/10"
-                        >
-                          {x.ability.name}
+                  <div className="genre text-xs">
+                    <div className="flex items-center justify-center gap-4">
+                      <div className="flex gap-1">
+                        <MaleIcon className="w-4" /> {genre === -1 ? 0 : 100 - genre}%
+                      </div>
+                      <div className="flex gap-1">
+                        <FemaleIcon className="w-4" /> {genre === -1 ? 0 : genre}%
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="typing flex justify-center gap-6">
+                    {pokemon.types.map(({ type }, index) => (
+                      <div
+                        key={index}
+                        className={`border-2 ${getBorderClassName(type.name)} 
+                        drop-shadow-[0_0_4px] ${getTextClassName(type.name)} 
+                        px-2 py-px rounded-md`}
+                      >
+                        <div className="flex gap-1">
+                          <div className="type-icon">
+                            {React.createElement(getTypeIcon(type.name), {
+                              className: `w-3 ${getStrokeColorClassName(type.name)}`,
+                            })}
+                          </div>
+                          <div className="type-name capitalize text-white">{type.name}</div>
                         </div>
-                      ))}
-                    </div>
+                      </div>
+                    ))}
                   </div>
-                )}
+                </div>
 
-                {tab === 1 && (
-                  <div className="grid grid-cols-2 gap-2">
+                <div className="text-center">
+                  {tab === 0 && (
                     <div className="flex flex-col gap-2">
-                      <div className="text-white">HEIGHT</div>
-                      <div className="text-white/70 text-sm capitalize border border-divide-light flex-1 p-2 rounded-3xl bg-white/10">
-                        {pokemon.height / 10}m
+                      <div className="text-text-light xl:text-text-dark dark:text-text-dark">
+                        POKÉDEX ENTRY
+                      </div>
+
+                      <div className="text-text-light/70 xl:text-text-dark dark:text-text-dark/70 text-xs">
+                        {getPokemonDescription(specie)}
                       </div>
                     </div>
+                  )}
 
+                  {tab === 1 && (
                     <div className="flex flex-col gap-2">
-                      <div className="text-white">WEIGHT</div>
-                      <div className="text-white/70 text-sm capitalize border border-divide-light flex-1 p-2 rounded-3xl bg-white/10">
-                        {pokemon.weight / 10}kg
+                      <div className="text-text-light dark:text-text-dark xl:text-text-dark">
+                        ABILITIES
+                      </div>
+
+                      <div className="text-text-light/70 xl:text-text-dark dark:text-text-dark/70 capitalize w-full flex justify-center flex-wrap gap-2">
+                        {pokemon.abilities.map((x, i) => (
+                          <div
+                            key={i}
+                            title={x.is_hidden ? "Hidden Ability" : ""}
+                            className="flex justify-center gap-1 cursor-pointer w-[45%] border border-divide-light p-2 text-xs rounded-3xl bg-white/10"
+                          >
+                            {x.ability.name} {x.is_hidden && <EyeNoneIcon />}
+                          </div>
+                        ))}
+                      </div>
+
+                      <div className="flex justify-center">
+                        <div className="w-[45%] text-text-light dark:text-text-dark xl:text-text-dark">
+                          HEIGHT
+                        </div>
+
+                        <div className="w-[45%] text-text-light dark:text-text-dark xl:text-text-dark">
+                          WEIGHT
+                        </div>
+                      </div>
+
+                      <div className="flex justify-center gap-2">
+                        <div className="w-[45%] cursor-pointer text-text-light/70 xl:text-text-dark dark:text-text-dark/70 text-xs capitalize border border-divide-light p-2 rounded-3xl bg-white/10">
+                          {pokemon.height / 10}m
+                        </div>
+
+                        <div className="w-[45%] cursor-pointer text-text-light/70 xl:text-text-dark dark:text-text-dark/70 text-xs capitalize border border-divide-light p-2 rounded-3xl bg-white/10">
+                          {pokemon.weight / 10}kg
+                        </div>
                       </div>
                     </div>
-                  </div>
-                )}
+                  )}
 
-                {tab === 2 && evolution && <Evolution chain={evolution} onClick={onChange} />}
+                  {tab === 2 && (
+                    <div className="flex flex-col gap-2">
+                      <div className="text-text-light dark:text-text-dark xl:text-text-dark">
+                        WEAKNESS
+                      </div>
+
+                      <div className="cursor-pointer text-text-light/70 xl:text-text-dark dark:text-text-dark/70 text-xs capitalize border border-divide-light flex-1 p-2 rounded-md bg-white/10">
+                        {weakness && (
+                          <table className="w-full border-separate border-spacing-0.5">
+                            <tbody>
+                              <tr hidden={!weakness["0"].length}>
+                                <td>
+                                  <div className="w-5 h-5 bg-secondary-500 rounded-full flex justify-center items-center">
+                                    0×
+                                  </div>
+                                </td>
+                                <td className="flex flex-wrap gap-0.5">
+                                  {weakness["0"].map(([key]) => (
+                                    <div
+                                      key={key}
+                                      className={`w-5 h-5 rounded-full flex justify-center items-center ${getBgClassName(
+                                        key
+                                      )}`}
+                                    >
+                                      {React.createElement(getTypeIcon(key as Typing), {
+                                        className: "w-3",
+                                      })}
+                                    </div>
+                                  ))}
+                                </td>
+                              </tr>
+
+                              <tr hidden={!weakness["1/4"].length}>
+                                <td>
+                                  <div className="w-5 h-5 bg-secondary-500 rounded-full flex justify-center items-center">
+                                    ¼×
+                                  </div>
+                                </td>
+                                <td className="flex flex-wrap gap-0.5">
+                                  {weakness["1/4"].map(([key]) => (
+                                    <div
+                                      key={key}
+                                      className={`w-5 h-5 rounded-full flex justify-center items-center ${getBgClassName(
+                                        key
+                                      )}`}
+                                    >
+                                      {React.createElement(getTypeIcon(key as Typing), {
+                                        className: "w-3",
+                                      })}
+                                    </div>
+                                  ))}
+                                </td>
+                              </tr>
+
+                              <tr hidden={!weakness["1/2"].length}>
+                                <td>
+                                  <div className="w-5 h-5 bg-secondary-500 rounded-full flex justify-center items-center">
+                                    ½×
+                                  </div>
+                                </td>
+                                <td className="flex flex-wrap gap-0.5">
+                                  {weakness["1/2"].map(([key]) => (
+                                    <div
+                                      key={key}
+                                      className={`w-5 h-5 rounded-full flex justify-center items-center ${getBgClassName(
+                                        key
+                                      )}`}
+                                    >
+                                      {React.createElement(getTypeIcon(key as Typing), {
+                                        className: "w-3",
+                                      })}
+                                    </div>
+                                  ))}
+                                </td>
+                              </tr>
+
+                              <tr hidden={!weakness["1"].length}>
+                                <td>
+                                  <div className="w-5 h-5 bg-secondary-500 rounded-full flex justify-center items-center">
+                                    1×
+                                  </div>
+                                </td>
+                                <td className="flex flex-wrap gap-0.5">
+                                  {weakness["1"].map(([key]) => (
+                                    <div
+                                      key={key}
+                                      className={`w-5 h-5 rounded-full flex justify-center items-center ${getBgClassName(
+                                        key
+                                      )}`}
+                                    >
+                                      {React.createElement(getTypeIcon(key as Typing), {
+                                        className: "w-3",
+                                      })}
+                                    </div>
+                                  ))}
+                                </td>
+                              </tr>
+
+                              <tr hidden={!weakness["2"].length}>
+                                <td>
+                                  <div className="w-5 h-5 bg-secondary-500 rounded-full flex justify-center items-center">
+                                    2×
+                                  </div>
+                                </td>
+                                <td className="flex flex-wrap gap-0.5">
+                                  {weakness["2"].map(([key]) => (
+                                    <div
+                                      key={key}
+                                      className={`w-5 h-5 rounded-full flex justify-center items-center ${getBgClassName(
+                                        key
+                                      )}`}
+                                    >
+                                      {React.createElement(getTypeIcon(key as Typing), {
+                                        className: "w-3",
+                                      })}
+                                    </div>
+                                  ))}
+                                </td>
+                              </tr>
+
+                              <tr hidden={!weakness["4"].length}>
+                                <td>
+                                  <div className="w-5 h-5 bg-secondary-500 rounded-full flex justify-center items-center">
+                                    4×
+                                  </div>
+                                </td>
+                                <td className="flex flex-wrap gap-0.5">
+                                  {weakness["4"].map(([key]) => (
+                                    <div
+                                      key={key}
+                                      className={`w-5 h-5 rounded-full flex justify-center items-center ${getBgClassName(
+                                        key
+                                      )}`}
+                                    >
+                                      {React.createElement(getTypeIcon(key as Typing), {
+                                        className: "w-3",
+                                      })}
+                                    </div>
+                                  ))}
+                                </td>
+                              </tr>
+                            </tbody>
+                          </table>
+                        )}
+                      </div>
+                    </div>
+                  )}
+
+                  {tab === 3 && evolution && <Evolution chain={evolution} onClick={onChange} />}
+                </div>
               </div>
             </div>
           </div>
