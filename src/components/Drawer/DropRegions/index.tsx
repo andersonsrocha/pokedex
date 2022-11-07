@@ -1,11 +1,12 @@
 import { useDroppable } from "@dnd-kit/core";
+import { forwardRef } from "react";
 
 export enum Region {
   Collapse = "collapse",
   Expand = "expand",
 }
 
-export function DropRegions() {
+export const DropRegions = forwardRef(() => {
   const { active, setNodeRef: setExpandRegionNodeRef } = useDroppable({
     id: Region.Expand,
   });
@@ -23,4 +24,4 @@ export function DropRegions() {
       <div ref={setCollapseRegionRef} />
     </div>
   );
-}
+});

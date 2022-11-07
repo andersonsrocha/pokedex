@@ -35,11 +35,11 @@
   width: 100%;
   height: 100%;
   transform: translateY(100%);
-  background-color: #232323;
+  background-color: #fff;
 }
 
 .drawer-content.expanded {
-  transform: translate3d(0, var(--transform), 0);
+  transform: translate3d(0, var(--transform, 0), 0);
 }
 
 @tailwind utilities;

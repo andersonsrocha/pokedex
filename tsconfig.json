@@ -24,7 +24,8 @@
       "@icons": ["src/icons/index"],
       "@constants": ["src/constants/index"],
       "@pages": ["src/pages/index"],
-      "@layout": ["src/layout/index"]
+      "@layout": ["src/layout/index"],
+      "@hooks": ["src/hooks/index"]
     }
   },
   "include": ["src"],

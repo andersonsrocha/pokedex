@@ -15,7 +15,7 @@ import { Pokemon, Specie } from "@types";
 type Props = {
   loading?: boolean;
   pokemon: Pokemon;
-  onClick?: () => void;
+  onClick?: (pokemon: Pokemon) => void;
 };
 
 export function Card(props: Props) {
@@ -80,8 +80,8 @@ export function Card(props: Props) {
 
   return (
     <Spin.Skeleton spinning={props.loading || loading}>
-      <div onClick={onClick}>
-        <div className="cursor-pointer min-h-[390px] shadow-lg md:hover:scale-105 dark:hover:shadow-white/10">
+      <div onClick={() => onClick?.(pokemon)} className="min-h-[390px]">
+        <div className="cursor-pointer shadow-lg md:hover:scale-105 dark:hover:shadow-white/10">
           {specie && (
             <div
               className={`card rounded-lg bg-gradient-to-br ${getGradientClassName(pokemon, 0)}`}

@@ -44,6 +44,10 @@ export default defineConfig({
         find: "@layout",
         replacement: path.resolve(__dirname, "./src/layout"),
       },
+      {
+        find: "@hooks",
+        replacement: path.resolve(__dirname, "./src/hooks"),
+      },
     ],
   },
 });

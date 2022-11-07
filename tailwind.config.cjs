@@ -6,7 +6,8 @@ module.exports = {
     extend: {
       animation: {
         strok: "strok 1.5s reverse",
-        fadeIn: "fadeIn 1s",
+        overlayShow: "overlay-show 150ms cubic-bezier(0.16, 1, 0.3, 1)",
+        contentShow: "content-show 150ms cubic-bezier(0.16, 1, 0.3, 1)",
       },
       transitionDuration: {
         0: "0ms",
@@ -123,12 +124,13 @@ module.exports = {
         strok: {
           "100%": { "stroke-dashoffset": 400 },
         },
-        fadeIn: {
-          from: {
-            opacity: "1",
-            transform:
-              "translate3d(initial, initial, 0) scale3d(initial, initial, initial) rotate(initial)",
-          },
+        "overlay-show": {
+          "0%": { opacity: 0 },
+          "100%": { opacity: 1 },
+        },
+        "content-show": {
+          "0%": { opacity: 0, transform: "translate(-50%, -48%) scale(.96)" },
+          "100%": { opacity: 1, transform: "translate(-50%, -50%) scale(1)" },
         },
       },
     },

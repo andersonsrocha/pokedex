@@ -22,12 +22,12 @@ export function Header() {
         </a>
 
         <div className="flex items-center gap-2 md:gap-4">
-          <Switch
+          {/* <Switch
             checked={dark}
             onChange={setDark}
             checkedChildren={<MoonIcon width={12} />}
             unCheckedChildren={<SunIcon width={12} />}
-          />
+          /> */}
 
           <a href="https://github.com/andersonsrocha" target="_blank" className="w-8">
             <GithubIcon />

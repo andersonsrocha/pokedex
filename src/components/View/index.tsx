@@ -268,7 +268,7 @@ export function View(props: Props) {
                               className: `w-3 ${getStrokeColorClassName(type.name)}`,
                             })}
                           </div>
-                          <div className="type-name capitalize text-white">{type.name}</div>
+                          <div className="type-name capitalize xl:text-white">{type.name}</div>
                         </div>
                       </div>
                     ))}
@@ -334,7 +334,7 @@ export function View(props: Props) {
                         WEAKNESS
                       </div>
 
-                      <div className="cursor-pointer text-text-light/70 xl:text-text-dark dark:text-text-dark/70 text-xs capitalize border border-divide-light flex-1 p-2 rounded-md bg-white/10">
+                      <div className="cursor-pointer text-text-dark dark:text-text-dark/70 text-xs capitalize border border-divide-light flex-1 p-2 rounded-md bg-white/10">
                         {weakness && (
                           <table className="w-full border-separate border-spacing-0.5">
                             <tbody>
