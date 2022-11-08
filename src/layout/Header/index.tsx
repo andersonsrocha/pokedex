@@ -1,19 +1,7 @@
-import { useEffect, useState } from "react";
-import { Switch } from "@components";
-import { Logo, GithubIcon, LinkedinIcon } from "@icons";
-import { MoonIcon, SunIcon } from "@radix-ui/react-icons";
+import { GitHubLogoIcon, LinkedInLogoIcon } from "@radix-ui/react-icons";
+import { Logo } from "@icons";
 
 export function Header() {
-  const [dark, setDark] = useState(false);
-
-  useEffect(() => {
-    if (dark) {
-      document.documentElement.classList.add("dark");
-    } else {
-      document.documentElement.classList.remove("dark");
-    }
-  }, [dark]);
-
   return (
     <div>
       <div className="fixed z-10 flex h-16 w-full max-w-[100vw] px-4 py-2 gap-2 bg-primary-500 justify-between items-center shadow-md md:px-20 md:gap-0 dark:bg-component-dark-600">
@@ -21,24 +9,13 @@ export function Header() {
           <Logo />
         </a>
 
-        <div className="flex items-center gap-2 md:gap-4">
-          {/* <Switch
-            checked={dark}
-            onChange={setDark}
-            checkedChildren={<MoonIcon width={12} />}
-            unCheckedChildren={<SunIcon width={12} />}
-          /> */}
-
-          <a href="https://github.com/andersonsrocha" target="_blank" className="w-8">
-            <GithubIcon />
+        <div className="flex items-center gap-2 md:gap-4 text-white">
+          <a href="https://github.com/andersonsrocha" target="_blank">
+            <GitHubLogoIcon width={32} height={32} />
           </a>
 
-          <a
-            href="https://www.linkedin.com/in/anderson-silva-a40926192"
-            target="_blank"
-            className="w-8"
-          >
-            <LinkedinIcon />
+          <a href="https://www.linkedin.com/in/anderson-silva-a40926192" target="_blank">
+            <LinkedInLogoIcon width={32} height={32} />
           </a>
         </div>
       </div>

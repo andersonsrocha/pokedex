@@ -1,9 +1,8 @@
 import React, { useEffect, useState, MouseEvent } from "react";
-import { FemaleIcon, MaleIcon, WaveIcon } from "@icons";
+import { BookIcon, DislikeIcon, EvolutionIcon, FemaleIcon, MaleIcon, PokeballIcon } from "@icons";
 import {
   getBgClassName,
   getBorderClassName,
-  getFillColorClassName,
   getStrokeColorClassName,
   getTextClassName,
   getType,
@@ -164,50 +163,60 @@ export function View(props: Props) {
           <div className="flex flex-col gap-4">
             <div className="extra relative z-30">
               <div className="absolute top-0 left-0">
-                <div className="flex">
-                  <div
+                <ul className="rounded-md py-2 flex flex-col items-center gap-4 text-secondary-500 xl:text-white/70 bg-black/5">
+                  <li
+                    onClick={() => setTab(0)}
                     className={classNames(
-                      "absolute duration-500 w-10 h-full transition-all left-8 -z-10",
-                      {
-                        "-top-16": tab === 0,
-                        "-top-8": tab === 1,
-                        "top-0": tab === 2,
-                        "top-8": tab === 3,
-                      }
+                      "cursor-pointer w-8 h-6 flex justify-center items-center",
+                      { "border-l-2 border-black/25": tab === 0 }
                     )}
                   >
-                    <WaveIcon className="fill-black/20 xl:fill-white/20" />
-                  </div>
-
-                  <ul className="flex flex-col gap-2 w-8 px-1 py-5 bg-black/20 xl:bg-white/20 rounded-3xl min-h-[120px]">
-                    <li onClick={() => setTab(0)} className="cursor-pointer">
-                      <Img
-                        className={classNames("duration-400 transition-all", {
-                          "ml-2": tab === 0,
-                        })}
-                        src="https://img.icons8.com/fluency/48/000000/pokeball.png"
-                      />
-                    </li>
-                    <li onClick={() => setTab(1)} className="cursor-pointer">
-                      <Img
-                        className={classNames("duration-400 transition-all", { "ml-2": tab === 1 })}
-                        src="https://img.icons8.com/color/48/000000/superball.png"
-                      />
-                    </li>
-                    <li onClick={() => setTab(2)} className="cursor-pointer">
-                      <Img
-                        className={classNames("duration-400 transition-all", { "ml-2": tab === 2 })}
-                        src="https://img.icons8.com/color/48/000000/ultra-ball.png"
-                      />
-                    </li>
-                    <li onClick={() => setTab(3)} className="cursor-pointer">
-                      <Img
-                        className={classNames("duration-400 transition-all", { "ml-2": tab === 3 })}
-                        src="https://img.icons8.com/color/48/null/mega-ball.png"
-                      />
-                    </li>
-                  </ul>
-                </div>
+                    <PokeballIcon
+                      className={classNames("[stroke-dasharray:400] w-5 h-5", {
+                        "animate-strok": tab === 0,
+                      })}
+                    />
+                  </li>
+                  <li
+                    onClick={() => setTab(1)}
+                    className={classNames(
+                      "cursor-pointer w-8 h-6 flex justify-center items-center",
+                      { "border-l-2 border-black/25": tab === 1 }
+                    )}
+                  >
+                    <BookIcon
+                      className={classNames("[stroke-dasharray:400] w-5 h-5", {
+                        "animate-strok": tab === 1,
+                      })}
+                    />
+                  </li>
+                  <li
+                    onClick={() => setTab(2)}
+                    className={classNames(
+                      "cursor-pointer w-8 h-6 flex justify-center items-center",
+                      { "border-l-2 border-black/25": tab === 2 }
+                    )}
+                  >
+                    <DislikeIcon
+                      className={classNames("[stroke-dasharray:400] w-5 h-5", {
+                        "animate-strok": tab === 2,
+                      })}
+                    />
+                  </li>
+                  <li
+                    onClick={() => setTab(3)}
+                    className={classNames(
+                      "cursor-pointer w-8 h-6 flex justify-center items-center",
+                      { "border-l-2 border-black/25": tab === 3 }
+                    )}
+                  >
+                    <EvolutionIcon
+                      className={classNames("[stroke-dasharray:400] stroke w-5 h-5", {
+                        "animate-strok": tab === 3,
+                      })}
+                    />
+                  </li>
+                </ul>
               </div>
 
               {specie.varieties.length > 1 && (
