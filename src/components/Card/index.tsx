@@ -79,7 +79,7 @@ export function Card(props: Props) {
   const pokeNumber = String(pokemon.id).padStart(3, "0");
 
   return (
-    <Spin.Skeleton spinning={props.loading || loading}>
+    <Spin.Spinner spinning={props.loading || loading}>
       <div onClick={() => onClick?.(pokemon)} className="min-h-[390px]">
         <div className="cursor-pointer shadow-lg md:hover:scale-105 dark:hover:shadow-white/10">
           {specie && (
@@ -194,6 +194,6 @@ export function Card(props: Props) {
           )}
         </div>
       </div>
-    </Spin.Skeleton>
+    </Spin.Spinner>
   );
 }

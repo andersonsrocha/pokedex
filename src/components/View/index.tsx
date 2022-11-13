@@ -155,7 +155,7 @@ export function View(props: Props) {
   const pokeNumber = String(pokemon?.id).padStart(3, "0");
 
   return (
-    <Spin.Skeleton spinning={props.loading || loading}>
+    <Spin.Spinner spinning={props.loading || loading}>
       <div
         className={`sticky top-24 rounded-lg p-4 xl:bg-gradient-to-br ${getGradientClassName(0)}`}
       >
@@ -492,6 +492,6 @@ export function View(props: Props) {
           </div>
         )}
       </div>
-    </Spin.Skeleton>
+    </Spin.Spinner>
   );
 }

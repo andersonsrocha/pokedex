@@ -7,10 +7,10 @@ type Props = {
 
 function Spinner({ spinning, children }: Props) {
   return (
-    <div className="h-full w-full">
+    <div className="relative">
       {spinning && (
-        <div className="flex justify-center items-center h-full w-full pointer-events-none">
-          <div className="absolute z-40">
+        <Fragment>
+          <div className="flex justify-center items-center w-full h-full z-40 absolute">
             <svg
               className="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
               xmlns="http://www.w3.org/2000/svg"
@@ -33,7 +33,7 @@ function Spinner({ spinning, children }: Props) {
             </svg>
           </div>
           <div className="blur-sm w-full">{children}</div>
-        </div>
+        </Fragment>
       )}
 
       {!spinning && children}
