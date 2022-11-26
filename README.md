@@ -16,12 +16,16 @@
 - [📦 Install](#-install)
 - [🔨 Build](#-build)
 - [🔍 Preview](#-preview)
+- [⭐ Credits](#-credits)
 - [🔗 Links](#-links)
 - [📝 License](#-license)
 
 ## 📄 About
 
-📝 Pokédex created with react and typescript, using vite as boilerplate and tailwind CSS as customization library.
+📝 Pokédex created with ReactJS + TypeScript, using vite as boilerplate and tailwind CSS as customization library.
+Tailwind is used to manipulate the page's css and customize the [Radix UI](https://www.radix-ui.com) components,
+the [Radix UI Icons](https://icons.radix-ui.com) library is used to compose some of the basic screen icons and
+[PokeApi](https://pokeapi.co) as the api for data consumption.
 
 ## 🚀 Technologies
 
@@ -63,6 +67,10 @@ yarn run build
 ```bash
 yarn run preview
 ```
+
+## ⭐ Credits
+
+- [Loading](https://codepen.io/tiffachoo/pen/WNxEJZP)
 
 ## 🔗 Links
 

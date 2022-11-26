@@ -7,7 +7,7 @@ type Props = {
 
 function Spinner({ spinning, children }: Props) {
   return (
-    <div className="relative">
+    <div className="relative h-full">
       {spinning && (
         <Fragment>
           <div className="flex justify-center items-center w-full h-full z-40 absolute">

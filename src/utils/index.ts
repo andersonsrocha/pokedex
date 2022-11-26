@@ -1,7 +1,9 @@
-import { Pokemon, Typing } from "@types";
 import * as Icons from "@icons";
 import { WEAKNESS } from "@constants";
 import classNames from "classnames";
+import { Pokemon } from "pokenode-ts";
+
+import { Typing } from "@types";
 
 export * from "./modifiers";
 

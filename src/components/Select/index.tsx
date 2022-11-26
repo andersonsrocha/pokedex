@@ -60,7 +60,7 @@ function Option(props: ItemProps) {
   return (
     <SelectPrimitive.Item
       value={value}
-      className="rounded-sm flex items-center h-6 pl-6 pr-8 relative select-none hover:bg-hover-light dark:hover:bg-hover-dark dark:text-text-dark"
+      className="font-brand rounded-sm flex items-center h-6 pl-6 pr-8 relative select-none hover:bg-hover-light dark:hover:bg-hover-dark dark:text-text-dark"
     >
       {icon && <SelectPrimitive.Icon className="mr-2">{icon}</SelectPrimitive.Icon>}
       <SelectPrimitive.ItemText>{children}</SelectPrimitive.ItemText>

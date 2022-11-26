@@ -10,3 +10,4 @@ export * from "./Drawer";
 export * from "./Select";
 export * from "./Input";
 export * from "./Switch";
+export * from "./Loading";

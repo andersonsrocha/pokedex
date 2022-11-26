@@ -15,10 +15,12 @@ import { MagnifyingGlassIcon, OpacityIcon } from "@radix-ui/react-icons";
 import { capitalize, getTypeIcon, getBgClassName } from "@utils";
 import { useMediaQuery } from "@hooks";
 import { TYPES } from "@constants";
+import { PokemonClient, Pokemon, NamedAPIResource } from "pokenode-ts";
 
-import { NamedUrl, Pokemon, Typing } from "@types";
+import { Typing } from "@types";
 
 export function List() {
+  const api = new PokemonClient();
   const input = useRef<HTMLInputElement>(null);
   const xl = useMediaQuery("(min-width: 1280px)");
 
@@ -69,12 +71,8 @@ export function List() {
     async (value: Typing) => {
       setLoading(true);
 
-      const request = await fetch(`https://pokeapi.co/api/v2/type/${value}`);
-      const response = await request.json();
-
-      const results = (response.pokemon as Array<any>).map<NamedUrl>(
-        (pokemon: any) => pokemon.pokemon
-      );
+      const { pokemon } = await api.getTypeByName(value);
+      const results = pokemon.map((pokemon) => pokemon.pokemon);
 
       const find = input.current?.value?.toLowerCase();
       const filtered = results.filter((x) => {
@@ -85,8 +83,7 @@ export function List() {
 
       const list: Array<Pokemon> = [];
       for (const item of filtered) {
-        const request = await fetch(item.url);
-        const pokemon = (await request.json()) as Pokemon;
+        const pokemon = await api.getPokemonByName(item.name);
         list.push(pokemon);
       }
 
@@ -121,18 +118,14 @@ export function List() {
 
         setLoading(true);
 
-        const request = await fetch("https://pokeapi.co/api/v2/pokemon-species?limit=10000");
-        const response = await request.json();
+        const { results } = await api.listPokemonSpecies(0, 10000);
 
-        const { results } = response;
-
-        const predicate = (x: NamedUrl) => x.name.toLowerCase().includes(value);
-        const newList = (results as Array<NamedUrl>).filter(predicate);
+        const predicate = (x: NamedAPIResource) => x.name.toLowerCase().includes(value);
+        const newList = results.filter(predicate);
 
         const list: Array<Pokemon> = [];
         for (const item of newList) {
-          const request = await fetch(item.url.replace("-species", ""));
-          const pokemon = (await request.json()) as Pokemon;
+          const pokemon = await api.getPokemonByName(item.name);
           list.push(pokemon);
         }
 
@@ -171,12 +164,15 @@ export function List() {
    */
   useEffect(() => {
     (async () => {
-      const request = await fetch("https://pokeapi.co/api/v2/pokemon-species");
-      const { count } = await request.json();
+      const { count } = await api.listPokemonSpecies();
       setLastIndex(count);
     })();
   }, []);
 
+  /**
+   * Define se o Drawer está aberto ou fechado,
+   * apenas se a tela for menor que xl.
+   */
   useEffect(() => {
     setOpen((open) => open && !xl);
   }, [xl]);
@@ -195,23 +191,19 @@ export function List() {
       setLoading(true);
 
       const { pageNumber, pageSize = 21 } = pagination;
-      const URL = `https://pokeapi.co/api/v2/pokemon-species?limit=${pageSize}&offset=${
-        (pageNumber - 1) * pageSize
-      }`;
+      const offset = (pageNumber - 1) * pageSize;
 
-      const request = await fetch(URL);
-      const response = await request.json();
+      const { results, count } = await api.listPokemonSpecies(offset, pageSize);
 
       const list: Array<Pokemon> = [];
-      for (const item of response.results) {
-        const request = await fetch(item.url.replace("-species", ""));
-        const pokemon = (await request.json()) as Pokemon;
+      for (const item of results) {
+        const pokemon = await api.getPokemonByName(item.name);
         list.push(pokemon);
       }
 
       setPokemon(list[0]);
       setPokemons(list);
-      setPagination((pag) => ({ ...pag, count: response.count }));
+      setPagination((pag) => ({ ...pag, count }));
       setLoading(false);
     })();
   }, [pagination.pageNumber, type, search]);

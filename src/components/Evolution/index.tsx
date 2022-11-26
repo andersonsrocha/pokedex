@@ -1,23 +1,22 @@
 import { Fragment, useEffect, useState } from "react";
 import { ArrowRightIcon } from "@radix-ui/react-icons";
+import { ChainLink, EvolutionDetail, Pokemon } from "pokenode-ts";
 
 import { Spin, Img } from "..";
 
-import { Chain, ChainDetails, Pokemon } from "@types";
-
 type Props = {
-  chain: Chain;
+  chain: ChainLink;
   onClick?: (pokemon: Pokemon) => void;
 };
 
 type Evolution = {
   pokemons: Array<Pokemon>;
-  details?: ChainDetails;
+  details?: EvolutionDetail;
 };
 
 type Details = {
   urls: Array<string>;
-  details?: ChainDetails;
+  details?: EvolutionDetail;
 };
 
 export function Evolution({ chain, onClick }: Props) {
@@ -29,13 +28,13 @@ export function Evolution({ chain, onClick }: Props) {
       setLoading(true);
 
       const species: Array<Details> = [];
-      const getSpecies = (arr: Array<Details> = [], chain: Chain) => {
+      const getSpecies = (arr: Array<Details> = [], chain: ChainLink) => {
         const url = chain.species.url.replace("-species", "");
         arr.push({ urls: [url], details: chain.evolution_details[0] });
         if (chain.evolves_to.length == 1) {
           chain.evolves_to.forEach((c) => getSpecies(arr, c));
         } else if (chain.evolves_to.length > 1) {
-          const predicate = (c: Chain) => c.species.url.replace("-species", "");
+          const predicate = (c: ChainLink) => c.species.url.replace("-species", "");
           arr.push({
             urls: chain.evolves_to.map(predicate),
             details: chain.evolves_to[0].evolution_details[0],
@@ -64,8 +63,8 @@ export function Evolution({ chain, onClick }: Props) {
 
   return (
     <Spin.Spinner spinning={loading}>
-      <div className="flex items-center justify-center">
-        {evolution.map(({ pokemons, details }, key) => (
+      <div className="flex items-center justify-center min-h-[60px]">
+        {evolution.map(({ pokemons }, key) => (
           <Fragment key={key}>
             {key !== 0 && (
               <div className="flex items-center">
@@ -79,7 +78,7 @@ export function Evolution({ chain, onClick }: Props) {
                   width={60}
                   onClick={() => onClick?.(pokemon)}
                   className="hover:scale-110 cursor-pointer"
-                  src={pokemon.sprites.other["official-artwork"].front_default}
+                  src={pokemon.sprites.other?.["official-artwork"].front_default || ""}
                   alt="icon"
                 />
               </div>

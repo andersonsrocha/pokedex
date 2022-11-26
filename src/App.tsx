@@ -1,10 +1,15 @@
+import React, { Suspense } from "react";
 import { Layout } from "@layout";
-import { List } from "@pages";
+import { Loading } from "@components";
+
+const List = React.lazy(() => import("@pages").then(({ List }) => ({ default: List })));
 
 export function App() {
   return (
-    <Layout>
-      <List />
-    </Layout>
+    <Suspense fallback={<Loading />}>
+      <Layout>
+        <List />
+      </Layout>
+    </Suspense>
   );
 }

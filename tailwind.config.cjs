@@ -135,7 +135,7 @@ module.exports = {
       },
     },
     fontFamily: {
-      brand: ["Bahnschrift", "'Roboto Condensed'", "sans-serif"],
+      brand: ["'Neucha'", "cursive", "Bahnschrift", "'Roboto Condensed'", "sans-serif"],
     },
   },
 };

@@ -11,10 +11,11 @@ import {
 } from "@utils";
 import { EyeNoneIcon } from "@radix-ui/react-icons";
 import classNames from "classnames";
+import { PokemonClient, Pokemon, PokemonSpecies, ChainLink } from "pokenode-ts";
 
 import { Spin, Img, Evolution } from "..";
 
-import { Chain, Pokemon, Specie, Typing } from "@types";
+import { Typing } from "@types";
 
 type Props = {
   loading?: boolean;
@@ -32,14 +33,16 @@ type Weakness = {
 };
 
 export function View(props: Props) {
+  const api = new PokemonClient();
+
   const { pokemon: poke, onChange } = props;
 
   const [tab, setTab] = useState(0);
   const [genre, setGenre] = useState(-1);
   const [variety, setVariety] = useState(0);
   const [pokemon, setPokemon] = useState<Pokemon>();
-  const [specie, setSpecie] = useState<Specie>();
-  const [evolution, setEvolution] = useState<Chain>();
+  const [specie, setSpecie] = useState<PokemonSpecies>();
+  const [evolution, setEvolution] = useState<ChainLink>();
   const [weakness, setWeakness] = useState<Weakness>();
   const [loading, setLoading] = useState(false);
 
@@ -70,7 +73,7 @@ export function View(props: Props) {
     return "";
   };
 
-  const getPokemonDescription = (specie: Specie) => {
+  const getPokemonDescription = (specie: PokemonSpecies) => {
     const { flavor_text_entries } = specie;
     const flavor_texts = flavor_text_entries.filter((x) => x.language.name == "en");
     const flavor_text = flavor_texts.pop();
@@ -78,7 +81,7 @@ export function View(props: Props) {
     return "";
   };
 
-  const getPokemonGenera = (specie: Specie) => {
+  const getPokemonGenera = (specie: PokemonSpecies) => {
     const { genera } = specie;
     const gen = genera.find((x) => x.language.name == "en");
     if (gen) return gen.genus;
@@ -93,18 +96,17 @@ export function View(props: Props) {
 
       const { varieties } = specie;
       const newIndex = oldIndex == varieties.length - 1 ? 0 : oldIndex + 1;
-      const url = varieties[newIndex].pokemon.url;
-      const request = await fetch(url);
-      const response = (await request.json()) as Pokemon;
+      const { name } = varieties[newIndex].pokemon;
+      const pokemon = await api.getPokemonByName(name);
 
-      if (response.name.includes("female")) {
+      if (pokemon.name.includes("female")) {
         setGenre(100);
-      } else if (response.name.includes("male")) {
+      } else if (pokemon.name.includes("male")) {
         setGenre(0);
       }
 
       setVariety(newIndex);
-      setPokemon(response);
+      setPokemon(pokemon);
       setTimeout(() => setLoading(false), 500);
     }
   };
@@ -115,12 +117,11 @@ export function View(props: Props) {
         setLoading(true);
 
         const { species } = poke;
-        const request1 = await fetch(species.url);
-        const specie = (await request1.json()) as Specie;
+        const specie = await api.getPokemonSpeciesByName(species.name);
 
         if (specie.evolution_chain) {
-          const request2 = await fetch(specie.evolution_chain.url);
-          const { chain } = await request2.json();
+          const request = await fetch(specie.evolution_chain.url);
+          const { chain } = await request.json();
           setEvolution(chain);
         } else {
           setEvolution(undefined);
@@ -133,7 +134,8 @@ export function View(props: Props) {
           setGenre(-1);
         }
 
-        const weakness = getWeakness(...poke.types.map((x) => x.type.name));
+        const types = poke.types.map(({ type }) => type.name);
+        const weakness = getWeakness(...types);
         const entries = Object.entries(weakness);
         const defense: Weakness = {
           "0": entries.filter((x) => x[1] === 0),
@@ -155,10 +157,8 @@ export function View(props: Props) {
   const pokeNumber = String(pokemon?.id).padStart(3, "0");
 
   return (
-    <Spin.Spinner spinning={props.loading || loading}>
-      <div
-        className={`sticky top-24 rounded-lg p-4 xl:bg-gradient-to-br ${getGradientClassName(0)}`}
-      >
+    <div className={`sticky top-24 rounded-lg p-4 xl:bg-gradient-to-br ${getGradientClassName(0)}`}>
+      <Spin.Spinner spinning={props.loading || loading}>
         {pokemon && specie && (
           <div className="flex flex-col gap-4">
             <div className="extra relative z-30">
@@ -235,7 +235,7 @@ export function View(props: Props) {
                 <Img
                   alt="poke"
                   width={150}
-                  src={pokemon.sprites.other["official-artwork"].front_default}
+                  src={pokemon.sprites.other?.["official-artwork"].front_default || ""}
                 />
               </div>
 
@@ -491,7 +491,7 @@ export function View(props: Props) {
             </div>
           </div>
         )}
-      </div>
-    </Spin.Spinner>
+      </Spin.Spinner>
+    </div>
   );
 }

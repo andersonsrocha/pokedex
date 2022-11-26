@@ -9,8 +9,7 @@ import {
 import { WeightIcon } from "@icons";
 import { HeightIcon } from "@radix-ui/react-icons";
 import { Img, Spin, Stats } from "@components";
-
-import { Pokemon, Specie } from "@types";
+import { Pokemon, PokemonClient, PokemonSpecies } from "pokenode-ts";
 
 type Props = {
   loading?: boolean;
@@ -19,12 +18,14 @@ type Props = {
 };
 
 export function Card(props: Props) {
+  const api = new PokemonClient();
+
   const { pokemon: poke, onClick } = props;
 
   const [loading, setLoading] = useState(false);
   const [variety, setVariety] = useState(0);
   const [pokemon, setPokemon] = useState<Pokemon>(poke);
-  const [specie, setSpecie] = useState<Specie>();
+  const [specie, setSpecie] = useState<PokemonSpecies>();
 
   const getWeight = (weight: number) => {
     return `${weight / 10} kg`;
@@ -35,14 +36,14 @@ export function Card(props: Props) {
   };
 
   const getSprite = (pokemon: Pokemon, form?: number) => {
-    let sprite = pokemon.sprites.other["official-artwork"].front_default;
+    let sprite = pokemon.sprites.other?.["official-artwork"].front_default;
     if (!sprite && form) {
       const number = String(pokemon.id).padStart(3, "0");
       const endpoint = `${number}_f${form}`;
       sprite = `https://assets.pokemon.com/assets/cms2/img/pokedex/full/${endpoint}.png`;
     }
 
-    return sprite;
+    return sprite || "";
   };
 
   const onVarietyChanged = async (e: MouseEvent, oldIndex: number) => {
@@ -53,12 +54,11 @@ export function Card(props: Props) {
 
       const { varieties } = specie;
       const newIndex = oldIndex == varieties.length - 1 ? 0 : oldIndex + 1;
-      const url = varieties[newIndex].pokemon.url;
-      const request = await fetch(url);
-      const response = await request.json();
+      const { name } = varieties[newIndex].pokemon;
+      const pokemon = await api.getPokemonByName(name);
 
       setVariety(newIndex);
-      setPokemon(response);
+      setPokemon(pokemon);
       setTimeout(() => setLoading(false), 500);
     }
   };
@@ -68,10 +68,9 @@ export function Card(props: Props) {
       setLoading(true);
 
       const { species } = pokemon;
-      const request = await fetch(species.url);
-      const response = await request.json();
+      const specie = await api.getPokemonSpeciesByName(species.name);
 
-      setSpecie(response);
+      setSpecie(specie);
       setTimeout(() => setLoading(false), 500);
     })();
   }, []);
@@ -101,7 +100,7 @@ export function Card(props: Props) {
                   </div>
                 </div>
 
-                <div className="image flex justify-center">
+                <div className="image flex justify-center min-h-[100px]">
                   <Img alt="poke" width={100} src={getSprite(pokemon)} />
                 </div>
 

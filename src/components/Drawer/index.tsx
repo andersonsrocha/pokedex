@@ -88,7 +88,7 @@ function Content({ children, expanded }: DrawerContentProps) {
   return (
     <DialogPrimitive.Portal>
       <DialogPrimitive.Overlay className="bg-black/30 fixed inset-0 animate-overlayShow" />
-      <div className="fixed flex justify-center items-end inset-0 overflow-hidden">
+      <div className="fixed flex justify-center items-end inset-0 overflow-hidden font-brand">
         <Draggable expanded={expanded}>{children}</Draggable>
         <DropRegions />
       </div>
