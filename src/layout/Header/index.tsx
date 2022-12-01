@@ -4,7 +4,7 @@ import { Logo } from "@icons";
 export function Header() {
   return (
     <div>
-      <div className="fixed z-10 flex h-16 w-full max-w-[100vw] px-4 py-2 gap-2 bg-primary-500 justify-between items-center shadow-md md:px-20 md:gap-0 dark:bg-component-dark-600">
+      <div className="fixed z-10 flex h-16 w-full max-w-[100vw] py-2 px-4 md:px-10 lg:px-20 bg-primary-500 justify-between items-center shadow-md dark:bg-component-dark-600">
         <a href="/" className="w-32">
           <Logo />
         </a>

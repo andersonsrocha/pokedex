@@ -11,7 +11,7 @@ export function Main({ children }: Props) {
   };
 
   return (
-    <main className="h-auto px-10 md:px-20 py-10 font-brand text-sm text-text-light min-h-[calc(100vh-128px)] dark:text-text-dark">
+    <main className="h-auto px-4 md:px-10 lg:px-20 py-10 font-brand text-sm text-text-light min-h-[calc(100vh-128px)] dark:text-text-dark">
       {children}
 
       <div className="fixed bottom-20 right-4">
