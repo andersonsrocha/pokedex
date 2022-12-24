@@ -77,6 +77,11 @@ export function range(from: number, to: number, step: number = 1) {
   return range;
 }
 
+export function getUrlId(url: string, separator: string) {
+  const separate = url.split(separator);
+  return (separate.pop() || "").replace(/\D/g, "");
+}
+
 export function getWeakness(...types: Array<Typing>): Record<Typing, number> {
   if (!types.length) return WEAKNESS.normal;
 

@@ -12,7 +12,7 @@ import {
   View,
 } from "@components";
 import { MagnifyingGlassIcon, OpacityIcon } from "@radix-ui/react-icons";
-import { capitalize, getTypeIcon, getBgClassName } from "@utils";
+import { capitalize, getTypeIcon, getBgClassName, getUrlId } from "@utils";
 import { useMediaQuery } from "@hooks";
 import { TYPES } from "@constants";
 import { PokemonClient, Pokemon, NamedAPIResource } from "pokenode-ts";
@@ -196,8 +196,9 @@ export function List() {
       const { results, count } = await api.listPokemonSpecies(offset, pageSize);
 
       const list: Array<Pokemon> = [];
-      for (const item of results) {
-        const pokemon = await api.getPokemonByName(item.name);
+      for (const { url } of results) {
+        const id = getUrlId(url, "pokemon-species");
+        const pokemon = await api.getPokemonById(Number(id));
         list.push(pokemon);
       }
 
@@ -209,87 +210,85 @@ export function List() {
   }, [pagination.pageNumber, type, search]);
 
   return (
-    <Fragment>
-      <Drawer open={open} onOpenChange={setOpen} onExpandChange={setExpand}>
-        <div className="flex flex-col gap-8">
-          <div className="shadow-md rounded-md bg-component-light p-4 mb-4 dark:bg-component-dark-600">
-            <div className="relative w-full">
-              <form autoComplete="off" onSubmit={(e) => onSearch(e, type)}>
-                <div className="flex gap-4">
-                  <Input
-                    ref={input}
-                    type="search"
-                    name="search"
-                    defaultValue={search}
-                    placeholder="Pesquisar"
-                    addonBefore={<MagnifyingGlassIcon />}
-                  />
+    <Drawer open={open} onOpenChange={setOpen} onExpandChange={setExpand}>
+      <div className="flex flex-col gap-8">
+        <div className="shadow-md rounded-md bg-component-light p-4 mb-4 dark:bg-component-dark-600">
+          <div className="relative w-full">
+            <form autoComplete="off" onSubmit={(e) => onSearch(e, type)}>
+              <div className="flex gap-4">
+                <Input
+                  ref={input}
+                  type="search"
+                  name="search"
+                  defaultValue={search}
+                  placeholder="Pesquisar"
+                  addonBefore={<MagnifyingGlassIcon />}
+                />
 
-                  <Select
-                    placeholder="Tipo"
-                    value={type}
-                    icon={<OpacityIcon />}
-                    onChange={onTypeChanged}
-                  >
-                    {TYPES.map((type) => (
-                      <Select.Option
-                        key={type}
-                        value={type}
-                        icon={
-                          <div
-                            className={`flex justify-center items-center w-4 h-4 rounded-full ${getBgClassName(
-                              type
-                            )}`}
-                          >
-                            {React.createElement(getTypeIcon(type), { className: "w-3" })}
-                          </div>
-                        }
-                      >
-                        {capitalize(type)}
-                      </Select.Option>
-                    ))}
-                  </Select>
-                </div>
-              </form>
-            </div>
+                <Select
+                  placeholder="Tipo"
+                  value={type}
+                  icon={<OpacityIcon />}
+                  onChange={onTypeChanged}
+                >
+                  {TYPES.map((type) => (
+                    <Select.Option
+                      key={type}
+                      value={type}
+                      icon={
+                        <div
+                          className={`flex justify-center items-center w-4 h-4 rounded-full ${getBgClassName(
+                            type
+                          )}`}
+                        >
+                          {React.createElement(getTypeIcon(type), { className: "w-3" })}
+                        </div>
+                      }
+                    >
+                      {capitalize(type)}
+                    </Select.Option>
+                  ))}
+                </Select>
+              </div>
+            </form>
           </div>
-
-          <Spin.Loading spinning={loading}>
-            {!!pokemons.length && (
-              <Fragment>
-                <div className="grid grid-cols-12 gap-6">
-                  <div className="col-span-12 xl:col-span-9">
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                      {onSliceList(pokemons, pagination).map((pokemon) => (
-                        <Card
-                          key={pokemon.name}
-                          loading={loading}
-                          pokemon={pokemon}
-                          onClick={onCardClick}
-                        />
-                      ))}
-                    </div>
-                  </div>
-
-                  <div className="col-span-3 hidden xl:block">
-                    <View loading={loading} pokemon={pokemon} onChange={setPokemon} />
-                  </div>
-                </div>
-
-                <div className="flex justify-center mt-8">
-                  <Pagination {...pagination} onChange={onPageChanged} />
-                </div>
-              </Fragment>
-            )}
-
-            {!pokemons.length && <Empty />}
-          </Spin.Loading>
         </div>
 
-        <Drawer.Content expanded={expand}>
-          <View loading={loading} pokemon={pokemon} onChange={setPokemon} />
-        </Drawer.Content>
-      </Drawer>
-    </Fragment>
+        <Spin.Loading spinning={loading}>
+          {!!pokemons.length && (
+            <Fragment>
+              <div className="grid grid-cols-12 gap-6">
+                <div className="col-span-12 xl:col-span-9">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {onSliceList(pokemons, pagination).map((pokemon) => (
+                      <Card
+                        key={pokemon.name}
+                        loading={loading}
+                        pokemon={pokemon}
+                        onClick={onCardClick}
+                      />
+                    ))}
+                  </div>
+                </div>
+
+                <div className="col-span-3 hidden xl:block">
+                  <View loading={loading} pokemon={pokemon} onChange={setPokemon} />
+                </div>
+              </div>
+
+              <div className="flex justify-center mt-8">
+                <Pagination {...pagination} onChange={onPageChanged} />
+              </div>
+            </Fragment>
+          )}
+
+          {!pokemons.length && <Empty />}
+        </Spin.Loading>
+      </div>
+
+      <Drawer.Content expanded={expand}>
+        <View loading={loading} pokemon={pokemon} onChange={setPokemon} />
+      </Drawer.Content>
+    </Drawer>
   );
 }
