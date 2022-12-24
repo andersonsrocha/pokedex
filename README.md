@@ -20,19 +20,19 @@
 
 # 🚀 Technologies
 
-- 🔩 **React**
-- 💡 **TypeScript**
-- ⚡ **Vite**
-- 🌈 **Tailwind CSS**
-- 🔥 **PokéApi**
+- 🔩 React
+- 💡 TypeScript
+- ⚡ Vite
+- 🌈 Tailwind CSS
+- 🔥 PokéApi
 
 # ✨ Features
 
-- 🔎 **Search pokemon by name**
-- 📱 **Responsiveness**
-- 📄 **Pagination**
-- ✨ **Shape change**
-- 👁️‍🗨️ **Icon change**
+- 🔎 Search pokemon by name
+- 📱 Responsiveness
+- 📄 Pagination
+- ✨ Shape change
+- 👁️‍🗨️ Icon change
 
 # 📦 Install
 
