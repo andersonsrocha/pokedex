@@ -26,7 +26,7 @@ export const Draggable = forwardRef(
         ref={ref}
         style={styles}
         className={classNames(
-          "drawer-content bg-component-light dark:bg-component-dark-600 rounded-t-3xl shadow-lg focus:outline-none",
+          "drawer-content animate-slideInUp animate-duration-500 bg-component-light dark:bg-component-dark-600 rounded-t-3xl shadow-lg focus:outline-none",
           { dragging: isDragging, expanded: expanded }
         )}
       >

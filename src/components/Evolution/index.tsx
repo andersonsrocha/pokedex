@@ -5,7 +5,7 @@ import { ChainLink, EvolutionDetail, Pokemon } from "pokenode-ts";
 import { Spin, Img } from "..";
 
 type Props = {
-  chain: ChainLink;
+  chain?: ChainLink;
   onClick?: (pokemon: Pokemon) => void;
 };
 
@@ -24,6 +24,8 @@ export function Evolution({ chain, onClick }: Props) {
   const [evolution, setEvolution] = useState<Array<Evolution>>([]);
 
   useEffect(() => {
+    if (!chain) return;
+
     (async () => {
       setLoading(true);
 

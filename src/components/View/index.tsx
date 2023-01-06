@@ -1,4 +1,4 @@
-import React, { useEffect, useState, MouseEvent } from "react";
+import React, { useState, MouseEvent, useEffect, useRef } from "react";
 import { BookIcon, DislikeIcon, EvolutionIcon, FemaleIcon, MaleIcon, PokeballIcon } from "@icons";
 import {
   getBgClassName,
@@ -10,10 +10,10 @@ import {
   getWeakness,
 } from "@utils";
 import { EyeNoneIcon } from "@radix-ui/react-icons";
-import classNames from "classnames";
 import { PokemonClient, Pokemon, PokemonSpecies, ChainLink } from "pokenode-ts";
+import classNames from "classnames";
 
-import { Spin, Img, Evolution } from "..";
+import { Spin, Img, Evolution, Stats } from "..";
 
 import { Typing } from "@types";
 
@@ -37,6 +37,7 @@ export function View(props: Props) {
 
   const { pokemon: poke, onChange } = props;
 
+  const cancelRequest = useRef(true);
   const [tab, setTab] = useState(0);
   const [genre, setGenre] = useState(-1);
   const [variety, setVariety] = useState(0);
@@ -112,46 +113,49 @@ export function View(props: Props) {
   };
 
   useEffect(() => {
-    if (poke) {
-      (async () => {
-        setLoading(true);
-
-        const { species } = poke;
-        const specie = await api.getPokemonSpeciesByName(species.name);
-
-        if (specie.evolution_chain) {
-          const request = await fetch(specie.evolution_chain.url);
-          const { chain } = await request.json();
-          setEvolution(chain);
-        } else {
-          setEvolution(undefined);
-        }
-
-        if (specie.gender_rate !== -1) {
-          const rate = (specie.gender_rate / 8) * 100;
-          setGenre(rate);
-        } else {
-          setGenre(-1);
-        }
-
-        const types = poke.types.map(({ type }) => type.name);
-        const weakness = getWeakness(...types);
-        const entries = Object.entries(weakness);
-        const defense: Weakness = {
-          "0": entries.filter((x) => x[1] === 0),
-          "1/4": entries.filter((x) => x[1] === 0.25),
-          "1/2": entries.filter((x) => x[1] === 0.5),
-          "1": entries.filter((x) => x[1] === 1),
-          "2": entries.filter((x) => x[1] === 2),
-          "4": entries.filter((x) => x[1] === 4),
-        };
-
-        setPokemon(poke);
-        setSpecie(specie);
-        setWeakness(defense);
-        setLoading(false);
-      })();
+    if (!poke || cancelRequest.current) {
+      cancelRequest.current = false;
+      return;
     }
+
+    (async () => {
+      setLoading(true);
+
+      const { species } = poke;
+      const specie = await api.getPokemonSpeciesByName(species.name);
+
+      if (specie.evolution_chain) {
+        const request = await fetch(specie.evolution_chain.url);
+        const { chain } = await request.json();
+        setEvolution(chain);
+      } else {
+        setEvolution(undefined);
+      }
+
+      if (specie.gender_rate !== -1) {
+        const rate = (specie.gender_rate / 8) * 100;
+        setGenre(rate);
+      } else {
+        setGenre(-1);
+      }
+
+      const types = poke.types.map(({ type }) => type.name);
+      const weakness = getWeakness(...types);
+      const entries = Object.entries(weakness);
+      const defense: Weakness = {
+        "0": entries.filter((x) => x[1] === 0),
+        "1/4": entries.filter((x) => x[1] === 0.25),
+        "1/2": entries.filter((x) => x[1] === 0.5),
+        "1": entries.filter((x) => x[1] === 1),
+        "2": entries.filter((x) => x[1] === 2),
+        "4": entries.filter((x) => x[1] === 4),
+      };
+
+      setPokemon(poke);
+      setSpecie(specie);
+      setWeakness(defense);
+      setLoading(false);
+    })();
   }, [poke]);
 
   const pokeNumber = String(pokemon?.id).padStart(3, "0");
@@ -285,207 +289,254 @@ export function View(props: Props) {
                 </div>
 
                 <div className="text-center">
-                  {tab === 0 && (
-                    <div className="flex flex-col gap-2">
-                      <div className="text-text-light xl:text-text-dark dark:text-text-dark">
-                        POKÉDEX ENTRY
-                      </div>
+                  <div
+                    className={classNames("gap-2", { "flex flex-col": tab == 0, hidden: tab != 0 })}
+                  >
+                    <div className="text-text-light xl:text-text-dark dark:text-text-dark">
+                      POKÉDEX ENTRY
+                    </div>
 
-                      <div className="text-text-light/70 xl:text-text-dark dark:text-text-dark/70 text-xs">
-                        {getPokemonDescription(specie)}
+                    <div className="text-text-light/70 xl:text-text-dark dark:text-text-dark/70 text-xs">
+                      {getPokemonDescription(specie)}
+                    </div>
+
+                    <div className="stats text-xs">
+                      <div className="grid grid-cols-12 items-center">
+                        <div className="col-span-3 font-bold">HP</div>
+                        <div className="col-span-2">{pokemon.stats[0].base_stat}</div>
+                        <div className="col-span-7">
+                          <Stats value={pokemon.stats[0].base_stat} />
+                        </div>
+                      </div>
+                      <div className="grid grid-cols-12 items-center">
+                        <div className="col-span-3 font-bold">Attack</div>
+                        <div className="col-span-2">{pokemon.stats[1].base_stat}</div>
+                        <div className="col-span-7">
+                          <Stats value={pokemon.stats[1].base_stat} />
+                        </div>
+                      </div>
+                      <div className="grid grid-cols-12 items-center">
+                        <div className="col-span-3 font-bold">Defense</div>
+                        <div className="col-span-2">{pokemon.stats[2].base_stat}</div>
+                        <div className="col-span-7">
+                          <Stats value={pokemon.stats[2].base_stat} />
+                        </div>
+                      </div>
+                      <div className="grid grid-cols-12 items-center">
+                        <div className="col-span-3 font-bold">Sp. Atk</div>
+                        <div className="col-span-2">{pokemon.stats[3].base_stat}</div>
+                        <div className="col-span-7">
+                          <Stats value={pokemon.stats[3].base_stat} />
+                        </div>
+                      </div>
+                      <div className="grid grid-cols-12 items-center">
+                        <div className="col-span-3 font-bold">Sp. Def</div>
+                        <div className="col-span-2">{pokemon.stats[4].base_stat}</div>
+                        <div className="col-span-7">
+                          <Stats value={pokemon.stats[4].base_stat} />
+                        </div>
+                      </div>
+                      <div className="grid grid-cols-12 items-center">
+                        <div className="col-span-3 font-bold">Speed</div>
+                        <div className="col-span-2">{pokemon.stats[5].base_stat}</div>
+                        <div className="col-span-7">
+                          <Stats value={pokemon.stats[5].base_stat} />
+                        </div>
                       </div>
                     </div>
-                  )}
+                  </div>
 
-                  {tab === 1 && (
-                    <div className="flex flex-col gap-2">
-                      <div className="text-text-light dark:text-text-dark xl:text-text-dark">
-                        ABILITIES
+                  <div
+                    className={classNames("gap-2", { "flex flex-col": tab == 1, hidden: tab != 1 })}
+                  >
+                    <div className="text-text-light dark:text-text-dark xl:text-text-dark">
+                      ABILITIES
+                    </div>
+
+                    <div className="text-text-light/70 xl:text-text-dark dark:text-text-dark/70 capitalize w-full flex justify-center flex-wrap gap-2">
+                      {pokemon.abilities.map((x, i) => (
+                        <div
+                          key={i}
+                          title={x.is_hidden ? "Hidden Ability" : ""}
+                          className="flex justify-center gap-1 cursor-pointer w-[45%] border border-divide-light p-2 text-xs rounded-3xl bg-white/10"
+                        >
+                          {x.ability.name} {x.is_hidden && <EyeNoneIcon />}
+                        </div>
+                      ))}
+                    </div>
+
+                    <div className="flex justify-center">
+                      <div className="w-[45%] text-text-light dark:text-text-dark xl:text-text-dark">
+                        HEIGHT
                       </div>
 
-                      <div className="text-text-light/70 xl:text-text-dark dark:text-text-dark/70 capitalize w-full flex justify-center flex-wrap gap-2">
-                        {pokemon.abilities.map((x, i) => (
-                          <div
-                            key={i}
-                            title={x.is_hidden ? "Hidden Ability" : ""}
-                            className="flex justify-center gap-1 cursor-pointer w-[45%] border border-divide-light p-2 text-xs rounded-3xl bg-white/10"
-                          >
-                            {x.ability.name} {x.is_hidden && <EyeNoneIcon />}
-                          </div>
-                        ))}
-                      </div>
-
-                      <div className="flex justify-center">
-                        <div className="w-[45%] text-text-light dark:text-text-dark xl:text-text-dark">
-                          HEIGHT
-                        </div>
-
-                        <div className="w-[45%] text-text-light dark:text-text-dark xl:text-text-dark">
-                          WEIGHT
-                        </div>
-                      </div>
-
-                      <div className="flex justify-center gap-2">
-                        <div className="w-[45%] cursor-pointer text-text-light/70 xl:text-text-dark dark:text-text-dark/70 text-xs capitalize border border-divide-light p-2 rounded-3xl bg-white/10">
-                          {pokemon.height / 10}m
-                        </div>
-
-                        <div className="w-[45%] cursor-pointer text-text-light/70 xl:text-text-dark dark:text-text-dark/70 text-xs capitalize border border-divide-light p-2 rounded-3xl bg-white/10">
-                          {pokemon.weight / 10}kg
-                        </div>
+                      <div className="w-[45%] text-text-light dark:text-text-dark xl:text-text-dark">
+                        WEIGHT
                       </div>
                     </div>
-                  )}
 
-                  {tab === 2 && (
-                    <div className="flex flex-col gap-2">
-                      <div className="text-text-light dark:text-text-dark xl:text-text-dark">
-                        WEAKNESS
+                    <div className="flex justify-center gap-2">
+                      <div className="w-[45%] cursor-pointer text-text-light/70 xl:text-text-dark dark:text-text-dark/70 text-xs capitalize border border-divide-light p-2 rounded-3xl bg-white/10">
+                        {pokemon.height / 10}m
                       </div>
 
-                      <div className="cursor-pointer text-text-dark dark:text-text-dark/70 text-xs capitalize border border-divide-light flex-1 p-2 rounded-md bg-white/10">
-                        {weakness && (
-                          <table className="w-full border-separate border-spacing-0.5">
-                            <tbody>
-                              <tr hidden={!weakness["0"].length}>
-                                <td>
-                                  <div className="w-5 h-5 bg-secondary-500 rounded-full flex justify-center items-center">
-                                    0×
-                                  </div>
-                                </td>
-                                <td className="flex flex-wrap gap-0.5">
-                                  {weakness["0"].map(([key]) => (
-                                    <div
-                                      key={key}
-                                      className={`w-5 h-5 rounded-full flex justify-center items-center ${getBgClassName(
-                                        key
-                                      )}`}
-                                    >
-                                      {React.createElement(getTypeIcon(key as Typing), {
-                                        className: "w-3",
-                                      })}
-                                    </div>
-                                  ))}
-                                </td>
-                              </tr>
-
-                              <tr hidden={!weakness["1/4"].length}>
-                                <td>
-                                  <div className="w-5 h-5 bg-secondary-500 rounded-full flex justify-center items-center">
-                                    ¼×
-                                  </div>
-                                </td>
-                                <td className="flex flex-wrap gap-0.5">
-                                  {weakness["1/4"].map(([key]) => (
-                                    <div
-                                      key={key}
-                                      className={`w-5 h-5 rounded-full flex justify-center items-center ${getBgClassName(
-                                        key
-                                      )}`}
-                                    >
-                                      {React.createElement(getTypeIcon(key as Typing), {
-                                        className: "w-3",
-                                      })}
-                                    </div>
-                                  ))}
-                                </td>
-                              </tr>
-
-                              <tr hidden={!weakness["1/2"].length}>
-                                <td>
-                                  <div className="w-5 h-5 bg-secondary-500 rounded-full flex justify-center items-center">
-                                    ½×
-                                  </div>
-                                </td>
-                                <td className="flex flex-wrap gap-0.5">
-                                  {weakness["1/2"].map(([key]) => (
-                                    <div
-                                      key={key}
-                                      className={`w-5 h-5 rounded-full flex justify-center items-center ${getBgClassName(
-                                        key
-                                      )}`}
-                                    >
-                                      {React.createElement(getTypeIcon(key as Typing), {
-                                        className: "w-3",
-                                      })}
-                                    </div>
-                                  ))}
-                                </td>
-                              </tr>
-
-                              <tr hidden={!weakness["1"].length}>
-                                <td>
-                                  <div className="w-5 h-5 bg-secondary-500 rounded-full flex justify-center items-center">
-                                    1×
-                                  </div>
-                                </td>
-                                <td className="flex flex-wrap gap-0.5">
-                                  {weakness["1"].map(([key]) => (
-                                    <div
-                                      key={key}
-                                      className={`w-5 h-5 rounded-full flex justify-center items-center ${getBgClassName(
-                                        key
-                                      )}`}
-                                    >
-                                      {React.createElement(getTypeIcon(key as Typing), {
-                                        className: "w-3",
-                                      })}
-                                    </div>
-                                  ))}
-                                </td>
-                              </tr>
-
-                              <tr hidden={!weakness["2"].length}>
-                                <td>
-                                  <div className="w-5 h-5 bg-secondary-500 rounded-full flex justify-center items-center">
-                                    2×
-                                  </div>
-                                </td>
-                                <td className="flex flex-wrap gap-0.5">
-                                  {weakness["2"].map(([key]) => (
-                                    <div
-                                      key={key}
-                                      className={`w-5 h-5 rounded-full flex justify-center items-center ${getBgClassName(
-                                        key
-                                      )}`}
-                                    >
-                                      {React.createElement(getTypeIcon(key as Typing), {
-                                        className: "w-3",
-                                      })}
-                                    </div>
-                                  ))}
-                                </td>
-                              </tr>
-
-                              <tr hidden={!weakness["4"].length}>
-                                <td>
-                                  <div className="w-5 h-5 bg-secondary-500 rounded-full flex justify-center items-center">
-                                    4×
-                                  </div>
-                                </td>
-                                <td className="flex flex-wrap gap-0.5">
-                                  {weakness["4"].map(([key]) => (
-                                    <div
-                                      key={key}
-                                      className={`w-5 h-5 rounded-full flex justify-center items-center ${getBgClassName(
-                                        key
-                                      )}`}
-                                    >
-                                      {React.createElement(getTypeIcon(key as Typing), {
-                                        className: "w-3",
-                                      })}
-                                    </div>
-                                  ))}
-                                </td>
-                              </tr>
-                            </tbody>
-                          </table>
-                        )}
+                      <div className="w-[45%] cursor-pointer text-text-light/70 xl:text-text-dark dark:text-text-dark/70 text-xs capitalize border border-divide-light p-2 rounded-3xl bg-white/10">
+                        {pokemon.weight / 10}kg
                       </div>
                     </div>
-                  )}
+                  </div>
 
-                  {tab === 3 && evolution && <Evolution chain={evolution} onClick={onChange} />}
+                  <div
+                    className={classNames("gap-2", { "flex flex-col": tab == 2, hidden: tab != 2 })}
+                  >
+                    <div className="text-text-light dark:text-text-dark xl:text-text-dark">
+                      WEAKNESS
+                    </div>
+
+                    <div className="cursor-pointer text-text-dark dark:text-text-dark/70 text-xs capitalize border border-divide-light flex-1 p-2 rounded-md bg-white/10">
+                      {weakness && (
+                        <table className="w-full border-separate border-spacing-0.5">
+                          <tbody>
+                            <tr hidden={!weakness["0"].length}>
+                              <td>
+                                <div className="w-5 h-5 bg-secondary-500 rounded-full flex justify-center items-center">
+                                  0×
+                                </div>
+                              </td>
+                              <td className="flex flex-wrap gap-0.5">
+                                {weakness["0"].map(([key]) => (
+                                  <div
+                                    key={key}
+                                    className={`w-5 h-5 rounded-full flex justify-center items-center ${getBgClassName(
+                                      key
+                                    )}`}
+                                  >
+                                    {React.createElement(getTypeIcon(key as Typing), {
+                                      className: "w-3",
+                                    })}
+                                  </div>
+                                ))}
+                              </td>
+                            </tr>
+
+                            <tr hidden={!weakness["1/4"].length}>
+                              <td>
+                                <div className="w-5 h-5 bg-secondary-500 rounded-full flex justify-center items-center">
+                                  ¼×
+                                </div>
+                              </td>
+                              <td className="flex flex-wrap gap-0.5">
+                                {weakness["1/4"].map(([key]) => (
+                                  <div
+                                    key={key}
+                                    className={`w-5 h-5 rounded-full flex justify-center items-center ${getBgClassName(
+                                      key
+                                    )}`}
+                                  >
+                                    {React.createElement(getTypeIcon(key as Typing), {
+                                      className: "w-3",
+                                    })}
+                                  </div>
+                                ))}
+                              </td>
+                            </tr>
+
+                            <tr hidden={!weakness["1/2"].length}>
+                              <td>
+                                <div className="w-5 h-5 bg-secondary-500 rounded-full flex justify-center items-center">
+                                  ½×
+                                </div>
+                              </td>
+                              <td className="flex flex-wrap gap-0.5">
+                                {weakness["1/2"].map(([key]) => (
+                                  <div
+                                    key={key}
+                                    className={`w-5 h-5 rounded-full flex justify-center items-center ${getBgClassName(
+                                      key
+                                    )}`}
+                                  >
+                                    {React.createElement(getTypeIcon(key as Typing), {
+                                      className: "w-3",
+                                    })}
+                                  </div>
+                                ))}
+                              </td>
+                            </tr>
+
+                            <tr hidden={!weakness["1"].length}>
+                              <td>
+                                <div className="w-5 h-5 bg-secondary-500 rounded-full flex justify-center items-center">
+                                  1×
+                                </div>
+                              </td>
+                              <td className="flex flex-wrap gap-0.5">
+                                {weakness["1"].map(([key]) => (
+                                  <div
+                                    key={key}
+                                    className={`w-5 h-5 rounded-full flex justify-center items-center ${getBgClassName(
+                                      key
+                                    )}`}
+                                  >
+                                    {React.createElement(getTypeIcon(key as Typing), {
+                                      className: "w-3",
+                                    })}
+                                  </div>
+                                ))}
+                              </td>
+                            </tr>
+
+                            <tr hidden={!weakness["2"].length}>
+                              <td>
+                                <div className="w-5 h-5 bg-secondary-500 rounded-full flex justify-center items-center">
+                                  2×
+                                </div>
+                              </td>
+                              <td className="flex flex-wrap gap-0.5">
+                                {weakness["2"].map(([key]) => (
+                                  <div
+                                    key={key}
+                                    className={`w-5 h-5 rounded-full flex justify-center items-center ${getBgClassName(
+                                      key
+                                    )}`}
+                                  >
+                                    {React.createElement(getTypeIcon(key as Typing), {
+                                      className: "w-3",
+                                    })}
+                                  </div>
+                                ))}
+                              </td>
+                            </tr>
+
+                            <tr hidden={!weakness["4"].length}>
+                              <td>
+                                <div className="w-5 h-5 bg-secondary-500 rounded-full flex justify-center items-center">
+                                  4×
+                                </div>
+                              </td>
+                              <td className="flex flex-wrap gap-0.5">
+                                {weakness["4"].map(([key]) => (
+                                  <div
+                                    key={key}
+                                    className={`w-5 h-5 rounded-full flex justify-center items-center ${getBgClassName(
+                                      key
+                                    )}`}
+                                  >
+                                    {React.createElement(getTypeIcon(key as Typing), {
+                                      className: "w-3",
+                                    })}
+                                  </div>
+                                ))}
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      )}
+                    </div>
+                  </div>
+
+                  <div hidden={!(tab == 3 && !!evolution)}>
+                    <Evolution chain={evolution} onClick={onChange} />
+                  </div>
                 </div>
               </div>
             </div>

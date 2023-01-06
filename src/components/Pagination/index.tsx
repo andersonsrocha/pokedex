@@ -8,7 +8,7 @@ export type PageChangeEvent = {
 };
 
 export type PaginationProps = {
-  pageSize?: number;
+  pageSize: number;
   pageNumber: number;
   count: number;
   onChange?: (e: PageChangeEvent) => void;

@@ -1,5 +1,7 @@
+const { withAnimations } = require("animated-tailwindcss");
+
 /** @type {import('tailwindcss').Config} */
-module.exports = {
+module.exports = withAnimations({
   darkMode: "class",
   content: ["./src/**/*.{ts,tsx}"],
   theme: {
@@ -8,6 +10,7 @@ module.exports = {
         strok: "strok 1.5s reverse",
         overlayShow: "overlay-show 150ms cubic-bezier(0.16, 1, 0.3, 1)",
         contentShow: "content-show 150ms cubic-bezier(0.16, 1, 0.3, 1)",
+        skeleton: "skeleton 2s cubic-bezier(.4,0,.6,1) infinite",
       },
       transitionDuration: {
         0: "0ms",
@@ -132,10 +135,14 @@ module.exports = {
           "0%": { opacity: 0, transform: "translate(-50%, -48%) scale(.96)" },
           "100%": { opacity: 1, transform: "translate(-50%, -50%) scale(1)" },
         },
+        skeleton: {
+          "50%": { opacity: 0.5 },
+        },
       },
     },
     fontFamily: {
       brand: ["'Neucha'", "cursive", "Bahnschrift", "'Roboto Condensed'", "sans-serif"],
     },
   },
-};
+  plugins: [],
+});

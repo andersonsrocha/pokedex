@@ -10,6 +10,7 @@ import { WeightIcon } from "@icons";
 import { HeightIcon } from "@radix-ui/react-icons";
 import { Img, Spin, Stats } from "@components";
 import { Pokemon, PokemonClient, PokemonSpecies } from "pokenode-ts";
+import { useMountEffect } from "@hooks";
 
 type Props = {
   loading?: boolean;
@@ -63,24 +64,22 @@ export function Card(props: Props) {
     }
   };
 
-  useEffect(() => {
-    (async () => {
-      setLoading(true);
+  useMountEffect(async () => {
+    setLoading(true);
 
-      const { species } = pokemon;
-      const specie = await api.getPokemonSpeciesByName(species.name);
+    const { species } = pokemon;
+    const specie = await api.getPokemonSpeciesByName(species.name);
 
-      setSpecie(specie);
-      setTimeout(() => setLoading(false), 500);
-    })();
-  }, []);
+    setSpecie(specie);
+    setTimeout(() => setLoading(false), 500);
+  });
 
   const pokeNumber = String(pokemon.id).padStart(3, "0");
 
   return (
     <Spin.Spinner spinning={props.loading || loading}>
       <div onClick={() => onClick?.(pokemon)} className="min-h-[390px]">
-        <div className="cursor-pointer shadow-lg md:hover:scale-105 dark:hover:shadow-white/10">
+        <div className="cursor-pointer shadow-lg transition-transform duration-300 md:hover:scale-105 dark:hover:shadow-white/10">
           {specie && (
             <div
               className={`card rounded-lg bg-gradient-to-br ${getGradientClassName(pokemon, 0)}`}

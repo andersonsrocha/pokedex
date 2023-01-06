@@ -46,10 +46,10 @@ function Skeleton({ spinning, children }: Props) {
     <Fragment>
       {spinning && (
         <div className="h-[390px] cursor-pointer bg-component-light rounded-lg items-center flex flex-col gap-2 p-4 dark:bg-component-dark-600">
-          <div className="h-6 w-14 rounded-sm bg-gray-400/30 animate-pulse" />
-          <div className="h-[100px] w-[100px] rounded-full bg-gray-400/30 animate-pulse" />
-          <div className="h-6 w-40 rounded-sm bg-gray-400/30 animate-pulse" />
-          <div className="w-full flex-1 rounded-sm bg-gray-400/30 animate-pulse" />
+          <div className="h-6 w-14 rounded-sm bg-gray-400/30 animate-skeleton" />
+          <div className="h-[100px] w-[100px] rounded-full bg-gray-400/30 animate-skeleton" />
+          <div className="h-6 w-40 rounded-sm bg-gray-400/30 animate-skeleton" />
+          <div className="w-full flex-1 rounded-sm bg-gray-400/30 animate-skeleton" />
         </div>
       )}
 
@@ -62,21 +62,13 @@ function Loading({ spinning, children }: Props) {
   return (
     <div>
       {spinning && (
-        <div className="grid grid-cols-12 gap-6 min-h-[calc(100vh-208px)]">
-          <div className="col-span-12 xl:col-span-9">
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-              <Skeleton spinning />
-              <Skeleton spinning />
-              <Skeleton spinning />
-              <Skeleton spinning />
-              <Skeleton spinning />
-              <Skeleton spinning />
-            </div>
-          </div>
-
-          <div className="col-span-3 hidden xl:block">
-            <Skeleton spinning />
-          </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 min-h-[calc(100vh-208px)]">
+          <Skeleton spinning />
+          <Skeleton spinning />
+          <Skeleton spinning />
+          <Skeleton spinning />
+          <Skeleton spinning />
+          <Skeleton spinning />
         </div>
       )}
 

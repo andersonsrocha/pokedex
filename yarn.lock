@@ -750,6 +750,11 @@ acorn@^7.0.0:
   resolved "https://registry.yarnpkg.com/acorn/-/acorn-7.4.1.tgz#feaed255973d2e77555b83dbc08851a6c63520fa"
   integrity sha512-nQyp0o1/mNdbTO1PO6kHkwSrmgZ0MT/jCCpNiwbUjGoRN4dlBhqJtoQuCnEOKzgTVwg0ZWiCoQy6SxMebQVh8A==
 
+animated-tailwindcss@^4.0.0:
+  version "4.0.0"
+  resolved "https://registry.yarnpkg.com/animated-tailwindcss/-/animated-tailwindcss-4.0.0.tgz#017eca1fdaf2e77c040225c24aa5a44fc564a4c2"
+  integrity sha512-sJquGVOQkdRuEJiDKX/bjjuXgGTpXBiNKiYD3ef+hoNdpWnjDrOVInOHB9QJC/Q7Ir5Ae+KEAg/ZW/ZBS6KcSw==
+
 ansi-styles@^3.2.1:
   version "3.2.1"
   resolved "https://registry.yarnpkg.com/ansi-styles/-/ansi-styles-3.2.1.tgz#41fbb20243e50b12be0f04b8dedbf07520ce841d"
