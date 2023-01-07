@@ -1,4 +1,4 @@
-import React, { useState, MouseEvent, useEffect, useRef } from "react";
+import React, { useState, MouseEvent, useEffect } from "react";
 import { BookIcon, DislikeIcon, EvolutionIcon, FemaleIcon, MaleIcon, PokeballIcon } from "@icons";
 import {
   getBgClassName,
@@ -37,7 +37,6 @@ export function View(props: Props) {
 
   const { pokemon: poke, onChange } = props;
 
-  const cancelRequest = useRef(true);
   const [tab, setTab] = useState(0);
   const [genre, setGenre] = useState(-1);
   const [variety, setVariety] = useState(0);
@@ -113,10 +112,7 @@ export function View(props: Props) {
   };
 
   useEffect(() => {
-    if (!poke || cancelRequest.current) {
-      cancelRequest.current = false;
-      return;
-    }
+    if (!poke) return;
 
     (async () => {
       setLoading(true);
