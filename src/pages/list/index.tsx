@@ -1,4 +1,4 @@
-import React, { FormEvent, Fragment, useCallback, useEffect, useRef, useState } from "react";
+import React, { FormEvent, useCallback, useEffect, useRef, useState } from "react";
 import {
   Card,
   Drawer,
@@ -13,7 +13,8 @@ import {
 } from "@components";
 import { MagnifyingGlassIcon, OpacityIcon } from "@radix-ui/react-icons";
 import { capitalize, getTypeIcon, getBgClassName, getUrlId } from "@utils";
-import { useMediaQuery, useMountEffect, useUpdateEffect } from "@hooks";
+import { useMountEffect } from "@hooks";
+import { useMediaQuery, useUpdateEffect } from "usehooks-ts";
 import { TYPES } from "@constants";
 import { PokemonClient, Pokemon, NamedAPIResource } from "pokenode-ts";
 
@@ -60,9 +61,20 @@ export function List() {
    *
    * @param {PageChangeEvent} param0 objeto da paginação.
    */
-  const onPageChanged = useCallback(({ pageNumber, pageSize }: PageChangeEvent) => {
-    setPagination((pag) => ({ ...pag, pageNumber, pageSize }));
-  }, []);
+  const onPageChanged = useCallback(
+    async ({ pageNumber, pageSize }: PageChangeEvent) => {
+      setLoading(true);
+
+      if (!(type || search)) {
+        const offset = (pageNumber - 1) * pageSize;
+        const { results } = await api.listPokemonSpecies(offset, pageSize);
+        setResponse(results);
+      }
+
+      setPagination((pag) => ({ ...pag, pageNumber, pageSize }));
+    },
+    [search, type]
+  );
 
   /**
    * Função responsável por realizar o filtro dos pokemons pelo tipo.
@@ -100,7 +112,6 @@ export function List() {
       setPokemon(undefined);
       setResponse(pokemons);
       setPagination((pag) => ({ ...pag, pageNumber: 1, count: filtered.length }));
-      setLoading(false);
     },
     [lastIndex]
   );
@@ -132,18 +143,17 @@ export function List() {
         const predicate = (x: NamedAPIResource) => x.name.toLowerCase().includes(value);
         const pokemons = results.filter(predicate);
 
-        setPokemons([]);
         setSearch(inputValue);
         setPokemon(undefined);
         setResponse(pokemons);
         setPagination((pag) => ({ ...pag, pageNumber: 1, count: pokemons.length }));
         setLoading(false);
       } else {
-        setPagination((pag) => ({ ...pag, pageNumber: 1 }));
         setSearch("");
+        onPageChanged({ pageNumber: 1, pageSize: 21 });
       }
     },
-    [onTypeChanged]
+    [onTypeChanged, onPageChanged]
   );
 
   /**
@@ -180,17 +190,9 @@ export function List() {
     (async () => {
       setLoading(true);
 
-      const { pageNumber, pageSize, count } = pagination;
-      const offset = (pageNumber - 1) * pageSize;
+      const { pageNumber, pageSize } = pagination;
+      const offset = type || search ? (pageNumber - 1) * pageSize : 0;
       const sliced = response.slice(offset, offset + pageSize);
-
-      if (sliced.length < 1 && count != response.length) {
-        const offset = (pageNumber - 1) * pageSize;
-        const { results } = await api.listPokemonSpecies(offset, pageSize);
-        // adiciona os itens na lista
-        sliced.push(...results);
-        setResponse(results);
-      }
 
       const list: Array<Pokemon> = [];
       for (const { url } of sliced) {
@@ -208,8 +210,8 @@ export function List() {
   return (
     <Drawer open={open} onOpenChange={setOpen} onExpandChange={setExpand}>
       <div className="flex flex-col lg:gap-6 lg:flex-row">
-        <div className="flex flex-col gap-4 lg:gap-8 w-12/12 lg:w-9/12">
-          <div className="shadow-md rounded-md bg-component-light p-4 mb-4 dark:bg-component-dark-600">
+        <div className="flex flex-col gap-4 lg:gap-6 w-12/12 lg:w-9/12">
+          <div className="shadow-md rounded-md bg-component-light p-4 dark:bg-component-dark-600">
             <div className="relative w-full">
               <form autoComplete="off" onSubmit={(e) => onSearch(e, type)}>
                 <div className="flex gap-4">
@@ -269,23 +271,28 @@ export function List() {
               )}
             </div>
 
-            <div className="flex justify-center mt-8">
+            <div className="flex justify-center mt-6">
               <Pagination {...pagination} onChange={onPageChanged} />
             </div>
           </Spin.Loading>
         </div>
 
         <div className="w-3/12">
-          <div className="w-full hidden xl:block">
+          <div className="w-full h-full hidden xl:block">
             <Spin.Skeleton spinning={loading}>
-              <View loading={loading} pokemon={pokemon} onChange={setPokemon} />
+              <View
+                loading={loading}
+                pokemon={pokemon}
+                onChange={setPokemon}
+                lastIndex={lastIndex}
+              />
             </Spin.Skeleton>
           </div>
         </div>
       </div>
 
       <Drawer.Content expanded={expand}>
-        <View loading={loading} pokemon={pokemon} onChange={setPokemon} />
+        <View loading={loading} pokemon={pokemon} onChange={setPokemon} lastIndex={lastIndex} />
       </Drawer.Content>
     </Drawer>
   );

@@ -1,4 +1,4 @@
-import React, { useState, MouseEvent, useEffect } from "react";
+import React, { useState, MouseEvent, useEffect, Fragment } from "react";
 import { BookIcon, DislikeIcon, EvolutionIcon, FemaleIcon, MaleIcon, PokeballIcon } from "@icons";
 import {
   getBgClassName,
@@ -20,6 +20,7 @@ import { Typing } from "@types";
 type Props = {
   loading?: boolean;
   pokemon?: Pokemon;
+  lastIndex: number;
   onChange?: (pokemon: Pokemon) => void;
 };
 
@@ -35,12 +36,14 @@ type Weakness = {
 export function View(props: Props) {
   const api = new PokemonClient();
 
-  const { pokemon: poke, onChange } = props;
+  const { pokemon: poke, onChange, lastIndex } = props;
 
   const [tab, setTab] = useState(0);
   const [genre, setGenre] = useState(-1);
   const [variety, setVariety] = useState(0);
   const [pokemon, setPokemon] = useState<Pokemon>();
+  const [prev, setPrev] = useState<Pokemon>();
+  const [next, setNext] = useState<Pokemon>();
   const [specie, setSpecie] = useState<PokemonSpecies>();
   const [evolution, setEvolution] = useState<ChainLink>();
   const [weakness, setWeakness] = useState<Weakness>();
@@ -135,6 +138,25 @@ export function View(props: Props) {
         setGenre(-1);
       }
 
+      if (poke.id >= 1 && poke.id <= lastIndex) {
+        if (poke.id !== 1) {
+          const prev = await api.getPokemonById(poke.id - 1);
+          setPrev(prev);
+        } else {
+          setNext(undefined);
+        }
+
+        if (poke.id !== lastIndex) {
+          const next = await api.getPokemonById(poke.id + 1);
+          setNext(next);
+        } else {
+          setNext(undefined);
+        }
+      } else {
+        setNext(undefined);
+        setPrev(undefined);
+      }
+
       const types = poke.types.map(({ type }) => type.name);
       const weakness = getWeakness(...types);
       const entries = Object.entries(weakness);
@@ -160,10 +182,10 @@ export function View(props: Props) {
     <div className={`sticky top-24 rounded-lg p-4 xl:bg-gradient-to-br ${getGradientClassName(0)}`}>
       <Spin.Spinner spinning={props.loading || loading}>
         {pokemon && specie && (
-          <div className="flex flex-col gap-4">
+          <Fragment>
             <div className="extra relative z-30">
               <div className="absolute top-0 left-0">
-                <ul className="rounded-md py-2 flex flex-col items-center gap-4 text-secondary-500 xl:text-white/70 bg-black/5">
+                <ul className="bg-black/5 rounded-md py-2 flex flex-col items-center gap-4 text-secondary-500 xl:text-white/70">
                   <li
                     onClick={() => setTab(0)}
                     className={classNames(
@@ -231,7 +253,7 @@ export function View(props: Props) {
             </div>
 
             <div className="card-header text-text-light dark:text-text-dark xl:text-text-dark z-20">
-              <div className="image flex justify-center items-end h-20">
+              <div className="image flex justify-center items-end h-24">
                 <Img
                   alt="poke"
                   width={150}
@@ -243,7 +265,7 @@ export function View(props: Props) {
                 #{pokeNumber}
               </div>
 
-              <div className="flex flex-col gap-4">
+              <div className="flex flex-col gap-6">
                 <div className="flex flex-col gap-2">
                   <div className="info text-center">
                     <div className="capitalize text-xl font-bold">{pokemon.name}</div>
@@ -258,7 +280,7 @@ export function View(props: Props) {
                         <MaleIcon className="w-4" /> {genre === -1 ? 0 : 100 - genre}%
                       </div>
                       <div className="flex gap-1">
-                        <FemaleIcon className="w-4" /> {genre === -1 ? 0 : genre}%
+                        {genre === -1 ? 0 : genre}% <FemaleIcon className="w-4" />
                       </div>
                     </div>
                   </div>
@@ -407,9 +429,7 @@ export function View(props: Props) {
                                       key
                                     )}`}
                                   >
-                                    {React.createElement(getTypeIcon(key as Typing), {
-                                      className: "w-3",
-                                    })}
+                                    {React.createElement(getTypeIcon(key), { className: "w-3" })}
                                   </div>
                                 ))}
                               </td>
@@ -534,9 +554,43 @@ export function View(props: Props) {
                     <Evolution chain={evolution} onClick={onChange} />
                   </div>
                 </div>
+
+                <div className="bg-white/5 grid grid-cols-2 p-1 min-h-[46px] rounded-md divide-x divide-white/10">
+                  <button
+                    disabled={!prev}
+                    onClick={() => onChange?.(prev!)}
+                    className="flex items-center gap-1 rounded-l-md p-1 capitalize enabled:hover:bg-white/10 disabled:cursor-not-allowed"
+                  >
+                    <div hidden={!prev}>
+                      <img
+                        alt="prev"
+                        src={prev?.sprites.versions["generation-vii"].icons.front_default || ""}
+                      />
+                    </div>
+                    <span className="overflow-hidden whitespace-nowrap text-ellipsis">
+                      {prev?.name}
+                    </span>
+                  </button>
+
+                  <button
+                    disabled={!next}
+                    onClick={() => onChange?.(next!)}
+                    className="flex justify-end items-center gap-1 rounded-r-md p-1 capitalize enabled:hover:bg-white/10 disabled:cursor-not-allowed"
+                  >
+                    <span className="overflow-hidden whitespace-nowrap text-ellipsis">
+                      {next?.name}
+                    </span>
+                    <div hidden={!next}>
+                      <img
+                        alt="next"
+                        src={next?.sprites.versions["generation-vii"].icons.front_default || ""}
+                      />
+                    </div>
+                  </button>
+                </div>
               </div>
             </div>
-          </div>
+          </Fragment>
         )}
       </Spin.Spinner>
     </div>

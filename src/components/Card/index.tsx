@@ -81,9 +81,7 @@ export function Card(props: Props) {
       <div onClick={() => onClick?.(pokemon)} className="min-h-[390px]">
         <div className="cursor-pointer shadow-lg transition-transform duration-300 md:hover:scale-105 dark:hover:shadow-white/10">
           {specie && (
-            <div
-              className={`card rounded-lg bg-gradient-to-br ${getGradientClassName(pokemon, 0)}`}
-            >
+            <div className={`rounded-lg bg-gradient-to-br ${getGradientClassName(pokemon, 0)}`}>
               <div className="card-header p-4 text-center text-white">
                 <div className="number font-extrabold relative">
                   <div className="number">#{pokeNumber}</div>
